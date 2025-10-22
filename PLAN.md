@@ -65,7 +65,7 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
 ## Technical Implementation Plan
 
 ### Phase 1: Project Setup
-1. Initialize Next.js project with TypeScript
+1. ~~Initialize Next.js project with TypeScript~~
 2. Configure for static export (`output: 'export'`)
 3. Set up PWA configuration (@ducanh2912/next-pwa?)
 4. Configure IndexedDB wrapper (Dexie.js recommended)
@@ -163,45 +163,54 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
 
 ## File Structure
 ```
-/memory-box-app
-├── /app
-│   ├── layout.tsx
-│   ├── page.tsx (dashboard/today's review)
-│   ├── /box
-│   │   └── page.tsx (box overview)
-│   ├── /cards
-│   │   ├── page.tsx (all cards)
-│   │   ├── /new
-│   │   │   └── page.tsx (create card)
-│   │   └── /[id]
-│   │       ├── page.tsx (view card)
-│   │       └── /edit
-│   │           └── page.tsx (edit card)
-│   └── /review
-│       └── page.tsx (review interface)
-├── /components
-│   ├── /ui (shadcn components)
-│   ├── /cards
-│   │   ├── CardForm.tsx
-│   │   ├── CardView.tsx
-│   │   └── CardList.tsx
-│   └── /box
-│       ├── ScheduleView.tsx
-│       └── BoxOverview.tsx
-├── /lib
-│   ├── /db
-│   │   ├── schema.ts
-│   │   ├── operations.ts
-│   │   └── sync.ts (future)
-│   ├── /utils
-│   │   ├── scheduling.ts
-│   │   └── dates.ts
-│   └── types.ts
-├── /public
-│   ├── manifest.json
-│   └── icons/
-├── next.config.js
-└── package.json
+/memory-box-frontend-v2
+├── PLAN.md
+├── /memory-box-next-app
+│   ├── /src
+│   │   ├── /app
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx (dashboard/today's review)
+│   │   │   ├── globals.css
+│   │   │   ├── /box
+│   │   │   │   └── page.tsx (box overview)
+│   │   │   ├── /cards
+│   │   │   │   ├── page.tsx (all cards)
+│   │   │   │   ├── /new
+│   │   │   │   │   └── page.tsx (create card)
+│   │   │   │   └── /[id]
+│   │   │   │       ├── page.tsx (view card)
+│   │   │   │       └── /edit
+│   │   │   │           └── page.tsx (edit card)
+│   │   │   └── /review
+│   │   │       └── page.tsx (review interface)
+│   │   ├── /components
+│   │   │   ├── /ui (shadcn components)
+│   │   │   ├── /cards
+│   │   │   │   ├── CardForm.tsx
+│   │   │   │   ├── CardView.tsx
+│   │   │   │   └── CardList.tsx
+│   │   │   └── /box
+│   │   │       ├── ScheduleView.tsx
+│   │   │       └── BoxOverview.tsx
+│   │   └── /lib
+│   │       ├── /db
+│   │       │   ├── schema.ts
+│   │       │   ├── operations.ts
+│   │       │   └── sync.ts (future)
+│   │       ├── /utils
+│   │       │   ├── scheduling.ts
+│   │       │   └── dates.ts
+│   │       └── types.ts
+│   ├── /public
+│   │   ├── manifest.json
+│   │   └── icons/
+│   ├── next.config.ts
+│   ├── tsconfig.json
+│   ├── tailwind.config.ts
+│   ├── postcss.config.mjs
+│   ├── .eslintrc.json
+│   └── package.json
+└── .git/
 ```
 
 ## Development Phases Timeline (Estimated)
