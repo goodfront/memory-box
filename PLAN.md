@@ -69,7 +69,7 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
 2. ~~Configure for static export (`output: 'export'`)~~
 3. ~~Set up PWA configuration (@ducanh2912/next-pwa?)~~
 4. ~~Configure IndexedDB wrapper (Dexie.js recommended)~~
-5. Set up basic routing structure
+5. ~~Set up basic routing structure~~
 
 ### Phase 2: Data Layer
 1. Design IndexedDB schema
