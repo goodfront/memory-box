@@ -4,7 +4,8 @@
       "WebFetch(domain:simplycharlottemason.com)",
       "Bash(npm run lint)",
       "Bash(npm test:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [],
     "ask": []

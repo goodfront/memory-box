@@ -6,7 +6,6 @@
 // Export database instance and schema functions
 export {
   db,
-  initializeDatabase,
   clearDatabase,
   exportData,
   importData,
@@ -27,3 +26,23 @@ export {
   getCardCountsBySchedule,
   getDueCardsCount
 } from './operations';
+
+// Export initialization functions and utilities
+export {
+  initializeDatabase,
+  checkBrowserCompatibility,
+  checkStorageQuota,
+  testDatabaseConnection,
+  getInitializationState,
+  isDatabaseReady,
+  performHealthCheck,
+  resetInitializationState,
+  DatabaseError,
+  BrowserCompatibilityError,
+  StorageQuotaError,
+  DatabaseConnectionError,
+  type DatabaseInitState
+} from './init';
+
+// Export React hooks
+export { useDatabase, useDatabaseStatus, type UseDatabaseResult } from './useDatabase';
