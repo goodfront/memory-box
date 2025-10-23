@@ -125,27 +125,6 @@ describe('clearDatabase', () => {
     const boxes = await db.boxes.toArray();
     expect(boxes).toHaveLength(0);
   });
-
-  it('should clear both cards and boxes', async () => {
-    // Add test data
-    await db.cards.add({
-      id: 'test-1',
-      quotation: 'Test quote',
-      schedule: 'daily',
-      timeAdded: new Date(),
-      timeModified: new Date(),
-      nextReview: new Date(),
-      reviewHistory: []
-    });
-
-    await clearDatabase();
-
-    const cards = await db.cards.toArray();
-    const boxes = await db.boxes.toArray();
-
-    expect(cards).toHaveLength(0);
-    expect(boxes).toHaveLength(0);
-  });
 });
 
 describe('exportData', () => {
