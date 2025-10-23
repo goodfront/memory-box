@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import type { Schedule } from '../types';
 import {
   calculateNextReview,
   addDays,
@@ -218,7 +219,7 @@ describe('calculateNextReview', () => {
 
   it('should throw error for invalid schedule', () => {
     const date = new Date('2024-01-15');
-    expect(() => calculateNextReview('invalid' as any, date)).toThrow('Invalid schedule');
+    expect(() => calculateNextReview('invalid' as unknown as Schedule, date)).toThrow('Invalid schedule');
   });
 });
 

@@ -7,9 +7,6 @@ import type { Schedule } from '../types';
  * @returns The next review date
  */
 export function calculateNextReview(schedule: Schedule, currentDate: Date = new Date()): Date {
-  // Create a new date to avoid mutating the input
-  const nextDate = new Date(currentDate);
-
   // Check if schedule is a number (monthly schedule)
   if (!isNaN(Number(schedule))) {
     const monthlyDay = Number(schedule);
