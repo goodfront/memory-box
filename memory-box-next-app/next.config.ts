@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   output: 'export',
+  turbopack: {}, // Silence Turbopack warning for PWA webpack config
 };
 
 export default withPWA(nextConfig);

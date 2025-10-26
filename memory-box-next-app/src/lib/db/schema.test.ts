@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   MemoryBoxDatabase,
-  initializeDatabase,
   clearDatabase,
   exportData,
   importData
 } from './schema';
+import { initializeDatabase } from './init';
 import type { Card, Box } from '../types';
 
 describe('MemoryBoxDatabase', () => {

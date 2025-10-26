@@ -34,30 +34,6 @@ export class MemoryBoxDatabase extends Dexie {
 export const db = new MemoryBoxDatabase();
 
 /**
- * Initialize the database with a default box if none exists
- * Should be called on app startup
- */
-export async function initializeDatabase(): Promise<void> {
-  try {
-    const boxCount = await db.boxes.count();
-
-    // Create default box if none exists (MVP: single box)
-    if (boxCount === 0) {
-      const now = new Date();
-      await db.boxes.add({
-        id: 'default-box',
-        name: 'My Memory Box',
-        createdAt: now,
-        modifiedAt: now
-      });
-    }
-  } catch (error) {
-    console.error('Error initializing database:', error);
-    throw error;
-  }
-}
-
-/**
  * Clear all data from the database (useful for testing/reset)
  */
 export async function clearDatabase(): Promise<void> {

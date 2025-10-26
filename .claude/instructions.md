@@ -12,3 +12,7 @@ After completing a task, run the following checks and make any needed changes:
 ## Commit Messages
 
 After finishing with the checks above, provide a commit message in the conventional commit format. **Do not try to create a commit** - just provide the commit message for the user to review.
+
+## Running the environment
+
+Use the docker compose setup to run the site locally
