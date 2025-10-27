@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { DatabaseProvider } from "@/components/providers";
+import { Header, Footer } from "@/components/layout";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Memory Box",
-  description: "Charlotte Mason memory system for memorizing quotations using spaced repetition",
+  description: "Memorize quotations using spaced repetition",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -27,9 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className="antialiased flex min-h-screen flex-col">
         <DatabaseProvider>
-          {children}
+          <Header />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
         </DatabaseProvider>
       </body>
     </html>

@@ -80,10 +80,10 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
 6. Add data export/import utilities (for backup)
 
 ### Phase 3: UI Components
-1. **Layout Components**
-   - App shell with navigation
-   - Header/Footer
-   - Responsive design (mobile-first)
+1. ~~**Layout Components**~~
+   - ~~App shell with navigation~~
+   - ~~Header/Footer~~
+   - ~~Responsive design (mobile-first)~~
 
 2. **Box View**
    - Overview of all schedule levels
