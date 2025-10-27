@@ -75,7 +75,7 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
 1. ~~Design IndexedDB schema~~
 2. ~~Create database initialization logic~~
 3. ~~Implement CRUD operations for Cards~~
-4. Create Box management functions
+4. ~~Create Box management functions~~
 5. Implement review scheduling logic (partially complete - review functions exist in operations.ts)
 6. Add data export/import utilities (for backup)
 

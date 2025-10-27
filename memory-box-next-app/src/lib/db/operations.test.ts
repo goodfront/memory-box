@@ -11,7 +11,12 @@ import {
   deleteCard,
   searchCards,
   getCardCountsBySchedule,
-  getDueCardsCount
+  getDueCardsCount,
+  getTotalCardCount,
+  getCardsNeverReviewed,
+  getLastReviewDate,
+  getTotalReviewCount,
+  getBoxStatistics
 } from './operations';
 import type { CreateCardInput } from '../types';
 
@@ -593,6 +598,286 @@ describe('Card CRUD Operations', () => {
       const count = await getDueCardsCount();
 
       expect(count).toBe(1);
+    });
+  });
+
+  describe('Box Management Functions', () => {
+    describe('getTotalCardCount', () => {
+      it('should return 0 when no cards exist', async () => {
+        const count = await getTotalCardCount();
+        expect(count).toBe(0);
+      });
+
+      it('should return correct count of cards', async () => {
+        await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        await createCard({ quotation: 'Card 2', schedule: 'even' });
+        await createCard({ quotation: 'Card 3', schedule: 'odd' });
+
+        const count = await getTotalCardCount();
+        expect(count).toBe(3);
+      });
+
+      it('should update count after adding cards', async () => {
+        const count1 = await getTotalCardCount();
+        expect(count1).toBe(0);
+
+        await createCard({ quotation: 'New card', schedule: 'daily' });
+
+        const count2 = await getTotalCardCount();
+        expect(count2).toBe(1);
+      });
+
+      it('should update count after deleting cards', async () => {
+        const card = await createCard({ quotation: 'Delete me', schedule: 'daily' });
+        const count1 = await getTotalCardCount();
+        expect(count1).toBe(1);
+
+        await deleteCard(card.id);
+
+        const count2 = await getTotalCardCount();
+        expect(count2).toBe(0);
+      });
+    });
+
+    describe('getCardsNeverReviewed', () => {
+      it('should return empty array when no cards exist', async () => {
+        const cards = await getCardsNeverReviewed();
+        expect(cards).toEqual([]);
+      });
+
+      it('should return all cards when none have been reviewed', async () => {
+        await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        await createCard({ quotation: 'Card 2', schedule: 'even' });
+
+        const cards = await getCardsNeverReviewed();
+        expect(cards).toHaveLength(2);
+      });
+
+      it('should not return cards that have been reviewed', async () => {
+        const card1 = await createCard({ quotation: 'Reviewed', schedule: 'daily' });
+        const card2 = await createCard({ quotation: 'Not reviewed', schedule: 'even' });
+
+        await markCardAsReviewed(card1.id);
+
+        const cards = await getCardsNeverReviewed();
+        expect(cards).toHaveLength(1);
+        expect(cards[0].id).toBe(card2.id);
+      });
+
+      it('should return empty array when all cards have been reviewed', async () => {
+        const card1 = await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        const card2 = await createCard({ quotation: 'Card 2', schedule: 'even' });
+
+        await markCardAsReviewed(card1.id);
+        await markCardAsReviewed(card2.id);
+
+        const cards = await getCardsNeverReviewed();
+        expect(cards).toEqual([]);
+      });
+    });
+
+    describe('getLastReviewDate', () => {
+      it('should return undefined when no cards exist', async () => {
+        const date = await getLastReviewDate();
+        expect(date).toBeUndefined();
+      });
+
+      it('should return undefined when no cards have been reviewed', async () => {
+        await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        await createCard({ quotation: 'Card 2', schedule: 'even' });
+
+        const date = await getLastReviewDate();
+        expect(date).toBeUndefined();
+      });
+
+      it('should return the review date when one card has been reviewed', async () => {
+        const card = await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        const reviewDate = new Date('2024-01-15T10:00:00Z');
+
+        await markCardAsReviewed(card.id, reviewDate);
+
+        const lastDate = await getLastReviewDate();
+        expect(lastDate).toEqual(reviewDate);
+      });
+
+      it('should return the most recent review date when multiple cards reviewed', async () => {
+        const card1 = await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        const card2 = await createCard({ quotation: 'Card 2', schedule: 'even' });
+        const card3 = await createCard({ quotation: 'Card 3', schedule: 'odd' });
+
+        const date1 = new Date('2024-01-15T10:00:00Z');
+        const date2 = new Date('2024-01-17T10:00:00Z');
+        const date3 = new Date('2024-01-16T10:00:00Z');
+
+        await markCardAsReviewed(card1.id, date1);
+        await markCardAsReviewed(card2.id, date2);
+        await markCardAsReviewed(card3.id, date3);
+
+        const lastDate = await getLastReviewDate();
+        expect(lastDate).toEqual(date2); // Most recent
+      });
+
+      it('should ignore unreviewed cards', async () => {
+        const card1 = await createCard({ quotation: 'Reviewed', schedule: 'daily' });
+        await createCard({ quotation: 'Not reviewed', schedule: 'even' });
+
+        const reviewDate = new Date('2024-01-15T10:00:00Z');
+        await markCardAsReviewed(card1.id, reviewDate);
+
+        const lastDate = await getLastReviewDate();
+        expect(lastDate).toEqual(reviewDate);
+      });
+    });
+
+    describe('getTotalReviewCount', () => {
+      it('should return 0 when no cards exist', async () => {
+        const count = await getTotalReviewCount();
+        expect(count).toBe(0);
+      });
+
+      it('should return 0 when cards exist but none reviewed', async () => {
+        await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        await createCard({ quotation: 'Card 2', schedule: 'even' });
+
+        const count = await getTotalReviewCount();
+        expect(count).toBe(0);
+      });
+
+      it('should count single review', async () => {
+        const card = await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        await markCardAsReviewed(card.id);
+
+        const count = await getTotalReviewCount();
+        expect(count).toBe(1);
+      });
+
+      it('should count multiple reviews on same card', async () => {
+        const card = await createCard({ quotation: 'Card 1', schedule: 'daily' });
+
+        await markCardAsReviewed(card.id, new Date('2024-01-15'));
+        await markCardAsReviewed(card.id, new Date('2024-01-16'));
+        await markCardAsReviewed(card.id, new Date('2024-01-17'));
+
+        const count = await getTotalReviewCount();
+        expect(count).toBe(3);
+      });
+
+      it('should count reviews across multiple cards', async () => {
+        const card1 = await createCard({ quotation: 'Card 1', schedule: 'daily' });
+        const card2 = await createCard({ quotation: 'Card 2', schedule: 'even' });
+        const card3 = await createCard({ quotation: 'Card 3', schedule: 'odd' });
+
+        await markCardAsReviewed(card1.id);
+        await markCardAsReviewed(card1.id);
+        await markCardAsReviewed(card2.id);
+        await markCardAsReviewed(card3.id);
+        await markCardAsReviewed(card3.id);
+        await markCardAsReviewed(card3.id);
+
+        const count = await getTotalReviewCount();
+        expect(count).toBe(6); // 2 + 1 + 3
+      });
+    });
+
+    describe('getBoxStatistics', () => {
+      it('should return empty statistics when no cards exist', async () => {
+        const stats = await getBoxStatistics();
+
+        expect(stats.totalCards).toBe(0);
+        expect(stats.cardsDue).toBe(0);
+        expect(stats.cardsNeverReviewed).toBe(0);
+        expect(stats.totalReviewsCompleted).toBe(0);
+        expect(stats.lastReviewDate).toBeUndefined();
+        expect(stats.scheduleBreakdown).toEqual({});
+      });
+
+      it('should return correct statistics for cards with no reviews', async () => {
+        await createCard({ quotation: 'Daily 1', schedule: 'daily' });
+        await createCard({ quotation: 'Daily 2', schedule: 'daily' });
+        await createCard({ quotation: 'Even 1', schedule: 'even' });
+
+        const stats = await getBoxStatistics();
+
+        expect(stats.totalCards).toBe(3);
+        expect(stats.cardsNeverReviewed).toBe(3);
+        expect(stats.totalReviewsCompleted).toBe(0);
+        expect(stats.lastReviewDate).toBeUndefined();
+        expect(stats.scheduleBreakdown).toEqual({
+          daily: 2,
+          even: 1
+        });
+      });
+
+      it('should return correct statistics with reviews', async () => {
+        const today = new Date('2024-01-15T10:00:00Z');
+        vi.setSystemTime(today);
+
+        const card1 = await createCard({ quotation: 'Daily', schedule: 'daily' });
+        const card2 = await createCard({ quotation: 'Even', schedule: 'even' });
+        const card3 = await createCard({ quotation: 'Not reviewed', schedule: 'odd' });
+
+        const reviewDate1 = new Date('2024-01-14T10:00:00Z');
+        const reviewDate2 = new Date('2024-01-15T10:00:00Z');
+
+        await markCardAsReviewed(card1.id, reviewDate1);
+        await markCardAsReviewed(card1.id, reviewDate2);
+        await markCardAsReviewed(card2.id, reviewDate2);
+
+        const stats = await getBoxStatistics();
+
+        expect(stats.totalCards).toBe(3);
+        expect(stats.cardsNeverReviewed).toBe(1);
+        expect(stats.totalReviewsCompleted).toBe(3); // 2 + 1
+        expect(stats.lastReviewDate).toEqual(reviewDate2);
+        expect(stats.scheduleBreakdown).toEqual({
+          daily: 1,
+          even: 1,
+          odd: 1
+        });
+
+        vi.useRealTimers();
+      });
+
+      it('should count due cards correctly', async () => {
+        const today = new Date('2024-01-15T10:00:00Z');
+        vi.setSystemTime(today);
+
+        const tomorrow = new Date('2024-01-16T10:00:00Z');
+
+        const card1 = await createCard({ quotation: 'Due today', schedule: 'daily' });
+        const card2 = await createCard({ quotation: 'Due tomorrow', schedule: 'even' });
+
+        await db.cards.update(card1.id, { nextReview: today });
+        await db.cards.update(card2.id, { nextReview: tomorrow });
+
+        const stats = await getBoxStatistics();
+
+        expect(stats.totalCards).toBe(2);
+        expect(stats.cardsDue).toBe(1);
+
+        vi.useRealTimers();
+      });
+
+      it('should handle complex box with mixed schedules', async () => {
+        await createCard({ quotation: 'Daily 1', schedule: 'daily' });
+        await createCard({ quotation: 'Daily 2', schedule: 'daily' });
+        await createCard({ quotation: 'Even', schedule: 'even' });
+        await createCard({ quotation: 'Odd', schedule: 'odd' });
+        await createCard({ quotation: 'Monday', schedule: 'monday' });
+        await createCard({ quotation: 'Monthly 15', schedule: '15' });
+        await createCard({ quotation: 'Monthly 15 again', schedule: '15' });
+
+        const stats = await getBoxStatistics();
+
+        expect(stats.totalCards).toBe(7);
+        expect(stats.scheduleBreakdown).toEqual({
+          daily: 2,
+          even: 1,
+          odd: 1,
+          monday: 1,
+          '15': 2
+        });
+      });
     });
   });
 });

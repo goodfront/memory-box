@@ -64,3 +64,15 @@ export type CreateCardInput = Omit<Card, 'id' | 'timeAdded' | 'timeModified' | '
  * Input type for updating a card (partial fields)
  */
 export type UpdateCardInput = Partial<Omit<Card, 'id' | 'timeAdded'>>;
+
+/**
+ * Box statistics for overview and dashboard
+ */
+export interface BoxStatistics {
+  totalCards: number;
+  cardsDue: number;
+  cardsNeverReviewed: number;
+  totalReviewsCompleted: number;
+  lastReviewDate?: Date;
+  scheduleBreakdown: Record<string, number>;
+}

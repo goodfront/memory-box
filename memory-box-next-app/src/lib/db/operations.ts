@@ -1,5 +1,5 @@
 import { db } from './schema';
-import type { Card, CreateCardInput, UpdateCardInput } from '../types';
+import type { Card, CreateCardInput, UpdateCardInput, BoxStatistics } from '../types';
 import { calculateNextReview } from '../utils/scheduling';
 
 /**
@@ -175,4 +175,84 @@ export async function getCardCountsBySchedule(): Promise<Record<string, number>>
 export async function getDueCardsCount(): Promise<number> {
   const dueCards = await getCardsDueForReview();
   return dueCards.length;
+}
+
+/**
+ * Box Management Functions
+ */
+
+/**
+ * Get total count of all cards in the box
+ * @returns Total number of cards
+ */
+export async function getTotalCardCount(): Promise<number> {
+  return await db.cards.count();
+}
+
+/**
+ * Get cards that have never been reviewed
+ * @returns Array of cards with no review history
+ */
+export async function getCardsNeverReviewed(): Promise<Card[]> {
+  const allCards = await db.cards.toArray();
+  return allCards.filter(card => !card.lastReviewed);
+}
+
+/**
+ * Get the most recent review date across all cards
+ * @returns The most recent review date, or undefined if no cards have been reviewed
+ */
+export async function getLastReviewDate(): Promise<Date | undefined> {
+  const allCards = await db.cards.toArray();
+  const reviewedCards = allCards.filter(card => card.lastReviewed);
+
+  if (reviewedCards.length === 0) {
+    return undefined;
+  }
+
+  return reviewedCards.reduce((latest, card) => {
+    if (!card.lastReviewed) return latest;
+    return !latest || card.lastReviewed > latest ? card.lastReviewed : latest;
+  }, undefined as Date | undefined);
+}
+
+/**
+ * Get total number of reviews completed across all cards
+ * @returns Total count of all reviews in history
+ */
+export async function getTotalReviewCount(): Promise<number> {
+  const allCards = await db.cards.toArray();
+  return allCards.reduce((total, card) => total + card.reviewHistory.length, 0);
+}
+
+/**
+ * Get comprehensive box statistics
+ * Provides an overview of all cards, reviews, and schedule distribution
+ * @returns BoxStatistics object with aggregated data
+ */
+export async function getBoxStatistics(): Promise<BoxStatistics> {
+  const [
+    totalCards,
+    cardsDue,
+    cardsNeverReviewed,
+    totalReviewsCompleted,
+    lastReviewDate,
+    scheduleBreakdown
+  ] = await Promise.all([
+    getTotalCardCount(),
+    getDueCardsCount(),
+    getCardsNeverReviewed().then(cards => cards.length),
+    getTotalReviewCount(),
+    getLastReviewDate(),
+    getCardCountsBySchedule()
+  ]);
+
+  return {
+    totalCards,
+    cardsDue,
+    cardsNeverReviewed,
+    totalReviewsCompleted,
+    lastReviewDate,
+    scheduleBreakdown
+  };
 }
