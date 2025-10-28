@@ -176,3 +176,37 @@ export function getScheduleDescription(schedule: Schedule): string {
       return `Every ${schedule.charAt(0).toUpperCase() + schedule.slice(1)}`;
   }
 }
+
+/**
+ * Get all possible schedule types in a logical order
+ * @returns Array of all schedule types
+ */
+export function getAllScheduleTypes(): Schedule[] {
+  const weekdays: Schedule[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const monthlyDays: Schedule[] = Array.from({ length: 31 }, (_, i) => String(i + 1) as Schedule);
+
+  return ['daily', 'even', 'odd', ...weekdays, ...monthlyDays];
+}
+
+/**
+ * Get a short label for a schedule type
+ * @param schedule The schedule type
+ * @returns Short label string
+ */
+export function getScheduleLabel(schedule: Schedule): string {
+  if (!isNaN(Number(schedule))) {
+    return `Day ${schedule}`;
+  }
+
+  switch (schedule) {
+    case 'daily':
+      return 'Daily';
+    case 'even':
+      return 'Even';
+    case 'odd':
+      return 'Odd';
+    default:
+      // Capitalize weekday names
+      return schedule.charAt(0).toUpperCase() + schedule.slice(1);
+  }
+}

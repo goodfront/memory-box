@@ -8,7 +8,9 @@ import {
   nextWeekday,
   nextMonthlyDate,
   isCardDue,
-  getScheduleDescription
+  getScheduleDescription,
+  getAllScheduleTypes,
+  getScheduleLabel
 } from './scheduling';
 
 describe('addDays', () => {
@@ -276,5 +278,97 @@ describe('getScheduleDescription', () => {
     expect(getScheduleDescription('1')).toBe('Monthly on day 1');
     expect(getScheduleDescription('15')).toBe('Monthly on day 15');
     expect(getScheduleDescription('31')).toBe('Monthly on day 31');
+  });
+});
+
+describe('getAllScheduleTypes', () => {
+  it('should return all 41 schedule types', () => {
+    const schedules = getAllScheduleTypes();
+    expect(schedules).toHaveLength(41);
+  });
+
+  it('should return schedules in correct order', () => {
+    const schedules = getAllScheduleTypes();
+
+    // First three should be frequency schedules
+    expect(schedules[0]).toBe('daily');
+    expect(schedules[1]).toBe('even');
+    expect(schedules[2]).toBe('odd');
+
+    // Next seven should be weekdays
+    expect(schedules[3]).toBe('sunday');
+    expect(schedules[4]).toBe('monday');
+    expect(schedules[5]).toBe('tuesday');
+    expect(schedules[6]).toBe('wednesday');
+    expect(schedules[7]).toBe('thursday');
+    expect(schedules[8]).toBe('friday');
+    expect(schedules[9]).toBe('saturday');
+
+    // Remaining 31 should be monthly days
+    expect(schedules[10]).toBe('1');
+    expect(schedules[11]).toBe('2');
+    expect(schedules[40]).toBe('31');
+  });
+
+  it('should return all unique schedule types', () => {
+    const schedules = getAllScheduleTypes();
+    const uniqueSchedules = new Set(schedules);
+    expect(uniqueSchedules.size).toBe(41);
+  });
+
+  it('should return valid Schedule types', () => {
+    const schedules = getAllScheduleTypes();
+
+    // Check that all returned values are valid Schedule types
+    schedules.forEach(schedule => {
+      expect(typeof schedule).toBe('string');
+    });
+
+    // Check specific known valid schedules
+    expect(schedules).toContain('daily');
+    expect(schedules).toContain('even');
+    expect(schedules).toContain('odd');
+    expect(schedules).toContain('monday');
+    expect(schedules).toContain('15');
+    expect(schedules).toContain('31');
+  });
+});
+
+describe('getScheduleLabel', () => {
+  it('should return label for daily', () => {
+    expect(getScheduleLabel('daily')).toBe('Daily');
+  });
+
+  it('should return label for even', () => {
+    expect(getScheduleLabel('even')).toBe('Even');
+  });
+
+  it('should return label for odd', () => {
+    expect(getScheduleLabel('odd')).toBe('Odd');
+  });
+
+  it('should return capitalized labels for weekdays', () => {
+    expect(getScheduleLabel('monday')).toBe('Monday');
+    expect(getScheduleLabel('tuesday')).toBe('Tuesday');
+    expect(getScheduleLabel('wednesday')).toBe('Wednesday');
+    expect(getScheduleLabel('thursday')).toBe('Thursday');
+    expect(getScheduleLabel('friday')).toBe('Friday');
+    expect(getScheduleLabel('saturday')).toBe('Saturday');
+    expect(getScheduleLabel('sunday')).toBe('Sunday');
+  });
+
+  it('should return "Day N" labels for monthly schedules', () => {
+    expect(getScheduleLabel('1')).toBe('Day 1');
+    expect(getScheduleLabel('10')).toBe('Day 10');
+    expect(getScheduleLabel('15')).toBe('Day 15');
+    expect(getScheduleLabel('31')).toBe('Day 31');
+  });
+
+  it('should handle all monthly days correctly', () => {
+    // Test a few random monthly days
+    for (let i = 1; i <= 31; i++) {
+      const schedule = String(i) as Schedule;
+      expect(getScheduleLabel(schedule)).toBe(`Day ${i}`);
+    }
   });
 });

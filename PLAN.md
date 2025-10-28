@@ -85,10 +85,10 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
    - ~~Header/Footer~~
    - ~~Responsive design (mobile-first)~~
 
-2. **Box View**
-   - Overview of all schedule levels
-   - Card count per schedule level
-   - Due cards indicator
+2. ~~**Box View**~~
+   - ~~Overview of all schedule levels~~
+   - ~~Card count per schedule level~~
+   - ~~Due cards indicator~~
 
 3. **Card Components**
    - Card creation form
