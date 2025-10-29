@@ -2,8 +2,10 @@
  * Test setup file for Vitest
  * Configures fake-indexeddb for testing IndexedDB operations
  * Sets up browser globals for testing
+ * Configures React Testing Library
  */
 
+import '@testing-library/jest-dom/vitest';
 import 'fake-indexeddb/auto';
 import { IDBFactory } from 'fake-indexeddb';
 import Dexie from 'dexie';
