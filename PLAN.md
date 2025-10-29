@@ -96,11 +96,11 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
    - ~~Card edit form~~
    - ~~Card list view~~
 
-4. **Review Interface**
-   - Today's review queue
-   - Review card display
-   - Recall success/failure actions
-   - Progress indicator
+4. ~~**Review Interface**~~
+   - ~~Today's review queue~~
+   - ~~Review card display~~
+   - ~~Recall success/failure actions~~
+   - ~~Progress indicator~~
 
 ### Phase 4: Core Features
 1. Add new card functionality
