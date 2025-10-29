@@ -90,11 +90,11 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
    - ~~Card count per schedule level~~
    - ~~Due cards indicator~~
 
-3. **Card Components**
-   - Card creation form
-   - Card display/review view
-   - Card edit form
-   - Card list view
+3. ~~**Card Components**~~
+   - ~~Card creation form~~
+   - ~~Card display/review view~~
+   - ~~Card edit form~~
+   - ~~Card list view~~
 
 4. **Review Interface**
    - Today's review queue
