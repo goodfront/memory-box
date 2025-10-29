@@ -103,7 +103,7 @@ Total: 41 possible schedules (1 daily + 1 even + 1 odd + 7 weekdays + 31 monthly
    - ~~Progress indicator~~
 
 ### Phase 4: Core Features
-1. Add new card functionality
+1. ~~Add new card functionality~~
 2. Daily review workflow
 3. Card progression through schedule levels
 4. Review history tracking
