@@ -357,18 +357,33 @@ describe('getScheduleLabel', () => {
     expect(getScheduleLabel('sunday')).toBe('Sunday');
   });
 
-  it('should return "Day N" labels for monthly schedules', () => {
-    expect(getScheduleLabel('1')).toBe('Day 1');
-    expect(getScheduleLabel('10')).toBe('Day 10');
-    expect(getScheduleLabel('15')).toBe('Day 15');
-    expect(getScheduleLabel('31')).toBe('Day 31');
+  it('should return ordinal labels for monthly schedules', () => {
+    expect(getScheduleLabel('1')).toBe('1st');
+    expect(getScheduleLabel('2')).toBe('2nd');
+    expect(getScheduleLabel('3')).toBe('3rd');
+    expect(getScheduleLabel('4')).toBe('4th');
+    expect(getScheduleLabel('10')).toBe('10th');
+    expect(getScheduleLabel('11')).toBe('11th');
+    expect(getScheduleLabel('12')).toBe('12th');
+    expect(getScheduleLabel('13')).toBe('13th');
+    expect(getScheduleLabel('15')).toBe('15th');
+    expect(getScheduleLabel('21')).toBe('21st');
+    expect(getScheduleLabel('22')).toBe('22nd');
+    expect(getScheduleLabel('23')).toBe('23rd');
+    expect(getScheduleLabel('31')).toBe('31st');
   });
 
-  it('should handle all monthly days correctly', () => {
-    // Test a few random monthly days
+  it('should handle all monthly days with correct ordinal suffixes', () => {
+    const expectedSuffixes: Record<number, string> = {
+      1: 'st', 2: 'nd', 3: 'rd', 4: 'th', 5: 'th', 6: 'th', 7: 'th', 8: 'th', 9: 'th', 10: 'th',
+      11: 'th', 12: 'th', 13: 'th', 14: 'th', 15: 'th', 16: 'th', 17: 'th', 18: 'th', 19: 'th', 20: 'th',
+      21: 'st', 22: 'nd', 23: 'rd', 24: 'th', 25: 'th', 26: 'th', 27: 'th', 28: 'th', 29: 'th', 30: 'th',
+      31: 'st'
+    };
+
     for (let i = 1; i <= 31; i++) {
       const schedule = String(i) as Schedule;
-      expect(getScheduleLabel(schedule)).toBe(`Day ${i}`);
+      expect(getScheduleLabel(schedule)).toBe(`${i}${expectedSuffixes[i]}`);
     }
   });
 });

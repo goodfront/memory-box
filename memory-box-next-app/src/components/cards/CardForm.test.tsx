@@ -1,33 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CardForm } from './CardForm';
-import type { Card, CreateCardInput } from '@/lib/types';
+import type { Card } from '@/lib/types';
 import * as schedulingUtils from '@/lib/utils/scheduling';
+
+// Helper to convert number to ordinal (same as in scheduling.ts)
+function getOrdinal(num: number): string {
+  const suffixes = ['th', 'st', 'nd', 'rd'];
+  const v = num % 100;
+  return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+}
 
 // Mock the scheduling utils
 vi.mock('@/lib/utils/scheduling', () => ({
   getAllScheduleTypes: vi.fn(),
   getScheduleLabel: vi.fn((schedule: string) => {
     if (!isNaN(Number(schedule))) {
-      return `Day ${schedule}`;
+      return getOrdinal(Number(schedule));
     }
     switch (schedule) {
       case 'daily': return 'Daily';
       case 'even': return 'Even';
       case 'odd': return 'Odd';
       default: return schedule.charAt(0).toUpperCase() + schedule.slice(1);
-    }
-  }),
-  getScheduleDescription: vi.fn((schedule: string) => {
-    if (!isNaN(Number(schedule))) {
-      return `Monthly on day ${schedule}`;
-    }
-    switch (schedule) {
-      case 'daily': return 'Every day';
-      case 'even': return 'Even days (2, 4, 6, etc.)';
-      case 'odd': return 'Odd days (1, 3, 5, etc.)';
-      default: return `Every ${schedule.charAt(0).toUpperCase() + schedule.slice(1)}`;
     }
   }),
 }));

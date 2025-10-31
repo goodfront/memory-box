@@ -89,7 +89,7 @@ describe('ScheduleView', () => {
     it('should display correct label and description for monthly schedules', () => {
       render(<ScheduleView schedule="15" cardCount={2} dueCount={0} />);
 
-      expect(screen.getByText('Day 15')).toBeInTheDocument();
+      expect(screen.getByText('15th')).toBeInTheDocument();
       expect(screen.getByText('Monthly on day 15')).toBeInTheDocument();
     });
   });
@@ -120,14 +120,14 @@ describe('ScheduleView', () => {
     it('should handle schedule "1" (first day of month)', () => {
       render(<ScheduleView schedule="1" cardCount={1} dueCount={0} />);
 
-      expect(screen.getByText('Day 1')).toBeInTheDocument();
+      expect(screen.getByText('1st')).toBeInTheDocument();
       expect(screen.getByText('Monthly on day 1')).toBeInTheDocument();
     });
 
     it('should handle schedule "31" (last day of month)', () => {
       render(<ScheduleView schedule="31" cardCount={1} dueCount={0} />);
 
-      expect(screen.getByText('Day 31')).toBeInTheDocument();
+      expect(screen.getByText('31st')).toBeInTheDocument();
       expect(screen.getByText('Monthly on day 31')).toBeInTheDocument();
     });
   });

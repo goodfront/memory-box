@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import NewCardPage from './page';
 import * as dbOperations from '@/lib/db/operations';
 import * as schedulingUtils from '@/lib/utils/scheduling';
+import type { Card } from '@/lib/types';
 
 // Mock the database operations
 vi.mock('@/lib/db/operations', () => ({
@@ -81,12 +82,13 @@ describe('NewCardPage', () => {
 
   it('should create a card and show success message', async () => {
     const user = userEvent.setup();
-    const mockCreatedCard = {
+    const mockCreatedCard: Card = {
       id: '123',
       quotation: 'Test quotation',
       schedule: 'daily',
       timeAdded: new Date(),
       timeModified: new Date(),
+      lastReviewed: new Date(),
       nextReview: new Date(),
       reviewHistory: [],
     };
@@ -137,12 +139,13 @@ describe('NewCardPage', () => {
 
   it('should allow creating multiple cards in succession', async () => {
     const user = userEvent.setup();
-    const mockCreatedCard = {
+    const mockCreatedCard: Card = {
       id: '123',
       quotation: 'First quotation',
       schedule: 'daily',
       timeAdded: new Date(),
       timeModified: new Date(),
+      lastReviewed: new Date(),
       nextReview: new Date(),
       reviewHistory: [],
     };
@@ -174,12 +177,13 @@ describe('NewCardPage', () => {
   it('should show success message when card is created', async () => {
     const user = userEvent.setup();
 
-    const mockCreatedCard = {
+    const mockCreatedCard: Card = {
       id: '123',
       quotation: 'Test quotation',
       schedule: 'daily',
       timeAdded: new Date(),
       timeModified: new Date(),
+      lastReviewed: new Date(),
       nextReview: new Date(),
       reviewHistory: [],
     };
@@ -219,12 +223,13 @@ describe('NewCardPage', () => {
     });
 
     // Second attempt succeeds
-    const mockCreatedCard = {
+    const mockCreatedCard: Card = {
       id: '123',
       quotation: 'Test quotation retry',
       schedule: 'daily',
       timeAdded: new Date(),
       timeModified: new Date(),
+      lastReviewed: new Date(),
       nextReview: new Date(),
       reviewHistory: [],
     };

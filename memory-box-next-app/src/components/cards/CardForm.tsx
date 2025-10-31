@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import type { Card, Schedule, CreateCardInput, UpdateCardInput } from '@/lib/types';
-import { getAllScheduleTypes, getScheduleLabel, getScheduleDescription } from '@/lib/utils/scheduling';
+import { getAllScheduleTypes, getScheduleLabel } from '@/lib/utils/scheduling';
 
 interface CardFormProps {
   /**
@@ -32,11 +32,6 @@ export function CardForm({ card, onSubmit, onCancel, submitButtonText = 'Save Ca
   const [error, setError] = useState<string | null>(null);
 
   const allSchedules = getAllScheduleTypes();
-
-  // Group schedules for easier selection
-  const frequencySchedules = allSchedules.slice(0, 3); // daily, even, odd
-  const weekdaySchedules = allSchedules.slice(3, 10); // sunday-saturday
-  const monthlySchedules = allSchedules.slice(10); // 1-31
 
   useEffect(() => {
     if (card) {
@@ -157,27 +152,11 @@ export function CardForm({ card, onSubmit, onCancel, submitButtonText = 'Save Ca
           required
           className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent"
         >
-          <optgroup label="Frequency">
-            {frequencySchedules.map((s) => (
-              <option key={s} value={s}>
-                {getScheduleLabel(s)} - {getScheduleDescription(s)}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="Weekly">
-            {weekdaySchedules.map((s) => (
-              <option key={s} value={s}>
-                {getScheduleLabel(s)} - {getScheduleDescription(s)}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="Monthly">
-            {monthlySchedules.map((s) => (
-              <option key={s} value={s}>
-                {getScheduleLabel(s)} - {getScheduleDescription(s)}
-              </option>
-            ))}
-          </optgroup>
+          {allSchedules.map((s) => (
+            <option key={s} value={s}>
+              {getScheduleLabel(s)}
+            </option>
+          ))}
         </select>
         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
           How often you want to review this quotation

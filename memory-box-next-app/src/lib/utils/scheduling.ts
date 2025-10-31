@@ -195,7 +195,7 @@ export function getAllScheduleTypes(): Schedule[] {
  */
 export function getScheduleLabel(schedule: Schedule): string {
   if (!isNaN(Number(schedule))) {
-    return `Day ${schedule}`;
+    return getOrdinal(Number(schedule));
   }
 
   switch (schedule) {
@@ -209,4 +209,15 @@ export function getScheduleLabel(schedule: Schedule): string {
       // Capitalize weekday names
       return schedule.charAt(0).toUpperCase() + schedule.slice(1);
   }
+}
+
+/**
+ * Convert a number to its ordinal representation (1st, 2nd, 3rd, etc.)
+ * @param num The number to convert
+ * @returns Ordinal string
+ */
+function getOrdinal(num: number): string {
+  const suffixes = ['th', 'st', 'nd', 'rd'];
+  const v = num % 100;
+  return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
 }
