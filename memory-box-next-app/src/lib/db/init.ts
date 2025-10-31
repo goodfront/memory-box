@@ -73,11 +73,12 @@ export function checkBrowserCompatibility(): { supported: boolean; error?: strin
     };
   }
 
-  // Check for crypto API (needed for UUID generation)
-  if (!window.crypto || !window.crypto.randomUUID) {
+  // Check for crypto.getRandomValues (needed for UUID generation polyfill)
+  // Note: We don't require crypto.randomUUID as we have a polyfill for that
+  if (!window.crypto || !window.crypto.getRandomValues) {
     return {
       supported: false,
-      error: 'Crypto API is not supported in this browser. Please use a modern browser.'
+      error: 'Crypto API (getRandomValues) is not supported in this browser. Please use a modern browser.'
     };
   }
 

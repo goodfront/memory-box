@@ -1,6 +1,7 @@
 import { db } from './schema';
 import type { Card, CreateCardInput, UpdateCardInput, BoxStatistics } from '../types';
 import { calculateNextReview } from '../utils/scheduling';
+import { generateUUID } from '../utils/uuid';
 
 /**
  * CRUD Operations for Cards
@@ -16,7 +17,7 @@ export async function createCard(input: CreateCardInput): Promise<Card> {
   const nextReview = calculateNextReview(input.schedule, input.lastReviewed || now);
 
   const card: Card = {
-    id: crypto.randomUUID(),
+    id: generateUUID(),
     ...input,
     timeAdded: now,
     timeModified: now,
