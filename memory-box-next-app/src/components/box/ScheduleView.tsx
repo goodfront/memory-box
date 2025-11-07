@@ -1,5 +1,5 @@
 import type { Schedule } from '@/lib/types';
-import { getScheduleLabel, getScheduleDescription } from '@/lib/utils/scheduling';
+import { getScheduleLabel } from '@/lib/utils/scheduling';
 
 interface ScheduleViewProps {
   schedule: Schedule;
@@ -34,17 +34,6 @@ export function ScheduleView({ schedule, cardCount, dueCount }: ScheduleViewProp
           >
             {getScheduleLabel(schedule)}
           </h3>
-          <p
-            className={`text-xs mt-0.5 truncate ${
-              hasCards
-                ? hasDueCards
-                  ? 'text-indigo-700 dark:text-indigo-300'
-                  : 'text-zinc-600 dark:text-zinc-400'
-                : 'text-zinc-400 dark:text-zinc-700'
-            }`}
-          >
-            {getScheduleDescription(schedule)}
-          </p>
         </div>
 
         <div className="ml-3 flex flex-col items-end gap-1">

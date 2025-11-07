@@ -20,17 +20,6 @@ vi.mock('@/lib/utils/scheduling', () => ({
       default: return schedule.charAt(0).toUpperCase() + schedule.slice(1);
     }
   }),
-  getScheduleDescription: vi.fn((schedule: string) => {
-    if (!isNaN(Number(schedule))) {
-      return `Monthly on day ${schedule}`;
-    }
-    switch (schedule) {
-      case 'daily': return 'Every day';
-      case 'even': return 'Even days (2, 4, 6, etc.)';
-      case 'odd': return 'Odd days (1, 3, 5, etc.)';
-      default: return `Every ${schedule.charAt(0).toUpperCase() + schedule.slice(1)}`;
-    }
-  }),
 }));
 
 describe('BoxOverview', () => {
@@ -252,8 +241,6 @@ describe('BoxOverview', () => {
       });
 
       expect(screen.getByText('Frequency Schedules')).toBeInTheDocument();
-      expect(screen.getByText('Weekly Schedules')).toBeInTheDocument();
-      expect(screen.getByText('Monthly Schedules')).toBeInTheDocument();
     });
   });
 

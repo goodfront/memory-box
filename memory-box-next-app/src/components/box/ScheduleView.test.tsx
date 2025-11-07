@@ -13,7 +13,6 @@ describe('ScheduleView', () => {
       const scheduleDiv = container.firstChild as HTMLElement;
       expect(scheduleDiv).toHaveClass('opacity-60');
       expect(screen.getByText('Daily')).toBeInTheDocument();
-      expect(screen.getByText('Every day')).toBeInTheDocument();
       expect(screen.getByText('0')).toBeInTheDocument();
     });
 
@@ -33,7 +32,6 @@ describe('ScheduleView', () => {
       const scheduleDiv = container.firstChild as HTMLElement;
       expect(scheduleDiv).not.toHaveClass('opacity-60');
       expect(screen.getByText('Even')).toBeInTheDocument();
-      expect(screen.getByText('Even days (2, 4, 6, etc.)')).toBeInTheDocument();
       expect(screen.getByText('5')).toBeInTheDocument();
     });
 
@@ -62,15 +60,14 @@ describe('ScheduleView', () => {
     });
   });
 
-  describe('schedule labels and descriptions', () => {
-    it('should display correct label and description for daily schedule', () => {
+  describe('schedule labels', () => {
+    it('should display correct label for daily schedule', () => {
       render(<ScheduleView schedule="daily" cardCount={1} dueCount={0} />);
 
       expect(screen.getByText('Daily')).toBeInTheDocument();
-      expect(screen.getByText('Every day')).toBeInTheDocument();
     });
 
-    it('should display correct label and description for weekday schedules', () => {
+    it('should display correct label for weekday schedules', () => {
       const weekdays: Schedule[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
       weekdays.forEach((day) => {
@@ -80,17 +77,15 @@ describe('ScheduleView', () => {
 
         const expectedLabel = day.charAt(0).toUpperCase() + day.slice(1);
         expect(screen.getByText(expectedLabel)).toBeInTheDocument();
-        expect(screen.getByText(`Every ${expectedLabel}`)).toBeInTheDocument();
 
         unmount();
       });
     });
 
-    it('should display correct label and description for monthly schedules', () => {
+    it('should display correct label for monthly schedules', () => {
       render(<ScheduleView schedule="15" cardCount={2} dueCount={0} />);
 
       expect(screen.getByText('15th')).toBeInTheDocument();
-      expect(screen.getByText('Monthly on day 15')).toBeInTheDocument();
     });
   });
 
@@ -121,14 +116,12 @@ describe('ScheduleView', () => {
       render(<ScheduleView schedule="1" cardCount={1} dueCount={0} />);
 
       expect(screen.getByText('1st')).toBeInTheDocument();
-      expect(screen.getByText('Monthly on day 1')).toBeInTheDocument();
     });
 
     it('should handle schedule "31" (last day of month)', () => {
       render(<ScheduleView schedule="31" cardCount={1} dueCount={0} />);
 
       expect(screen.getByText('31st')).toBeInTheDocument();
-      expect(screen.getByText('Monthly on day 31')).toBeInTheDocument();
     });
   });
 });

@@ -138,9 +138,6 @@ export function BoxOverview() {
 
         {/* Weekdays */}
         <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
-            Weekly Schedules
-          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
             {scheduleData.slice(3, 10).map((data) => (
               <ScheduleView
@@ -155,9 +152,6 @@ export function BoxOverview() {
 
         {/* Monthly Days */}
         <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
-            Monthly Schedules
-          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
             {scheduleData.slice(10).map((data) => (
               <ScheduleView
