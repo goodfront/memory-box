@@ -63,6 +63,18 @@ export default function Home() {
               View schedule levels and card counts
             </p>
           </Link>
+
+          <Link
+            href="/dev"
+            className="flex flex-col gap-2 rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950 p-6 transition-colors hover:bg-amber-100 dark:hover:bg-amber-900"
+          >
+            <h2 className="text-xl font-semibold text-amber-900 dark:text-amber-100">
+              Dev Tools
+            </h2>
+            <p className="text-sm text-amber-700 dark:text-amber-300">
+              Inject test cards for development
+            </p>
+          </Link>
         </div>
       </div>
     </div>
