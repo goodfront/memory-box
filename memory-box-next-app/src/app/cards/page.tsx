@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CardList, type SortOption } from '@/components/cards/CardList';
 import { getAllCards } from '@/lib/db/operations';
 import type { Card, Schedule } from '@/lib/types';
 
-export default function CardsPage() {
+function CardsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [cards, setCards] = useState<Card[]>([]);
@@ -103,5 +103,26 @@ export default function CardsPage() {
         onScheduleFilterChange={handleScheduleFilterChange}
       />
     </div>
+  );
+}
+
+export default function CardsPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+              All Cards
+            </h1>
+          </div>
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Loading cards...
+          </p>
+        </div>
+      </div>
+    }>
+      <CardsPageContent />
+    </Suspense>
   );
 }

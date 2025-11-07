@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DatabaseProvider } from "@/components/providers";
+import { DatabaseProvider, ServiceWorkerProvider } from "@/components/providers";
 import { Header, Footer } from "@/components/layout";
 import "./globals.css";
 
@@ -30,6 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased flex min-h-screen flex-col">
         <DatabaseProvider>
+          <ServiceWorkerProvider />
           <Header />
           <main className="flex-1">
             {children}

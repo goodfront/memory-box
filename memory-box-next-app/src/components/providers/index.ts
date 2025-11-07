@@ -3,3 +3,4 @@
  */
 
 export { DatabaseProvider, useDatabaseContext } from './DatabaseProvider';
+export { ServiceWorkerProvider } from './ServiceWorkerProvider';
