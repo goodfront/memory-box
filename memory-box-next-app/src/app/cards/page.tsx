@@ -37,7 +37,7 @@ function CardsPageContent() {
   };
 
   const handleCardClick = (card: Card) => {
-    router.push(`/cards/${card.id}`);
+    router.push(`/cards/view?id=${card.id}`);
   };
 
   // Update URL when filters change
