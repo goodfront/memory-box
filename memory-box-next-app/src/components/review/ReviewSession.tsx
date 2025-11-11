@@ -123,7 +123,7 @@ export function ReviewSession({ cards, onComplete, onCardReviewed }: ReviewSessi
           No cards to review
         </h2>
         <p className="text-zinc-600 dark:text-zinc-400">
-          Great job! You're all caught up for today.
+          Great job! You&apos;re all caught up for today.
         </p>
       </div>
     );

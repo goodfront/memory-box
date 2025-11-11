@@ -132,10 +132,6 @@ export function CardList({
     return text.substring(0, maxLength) + '...';
   };
 
-  const isOverdue = (nextReview: Date): boolean => {
-    return new Date(nextReview) < new Date();
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">

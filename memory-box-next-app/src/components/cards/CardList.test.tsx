@@ -3,7 +3,6 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CardList } from './CardList';
 import type { Card } from '@/lib/types';
-import * as schedulingUtils from '@/lib/utils/scheduling';
 
 // Mock the scheduling utils
 vi.mock('@/lib/utils/scheduling', () => ({
@@ -118,8 +117,9 @@ describe('CardList', () => {
 
     it('should display review counts', () => {
       render(<CardList cards={mockCards} />);
-      const reviewCounts = screen.getAllByText(/reviews:/i);
-      expect(reviewCounts).toHaveLength(3);
+      expect(screen.getByText('1 reviews')).toBeInTheDocument();
+      expect(screen.getByText('2 reviews')).toBeInTheDocument();
+      expect(screen.getByText('0 reviews')).toBeInTheDocument();
     });
 
     it('should truncate long quotations', () => {
@@ -158,7 +158,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const searchInput = screen.getByPlaceholderText(/search cards/i);
+      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
       await user.type(searchInput, 'First');
 
       expect(screen.getByText('First quotation')).toBeInTheDocument();
@@ -170,7 +170,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const searchInput = screen.getByPlaceholderText(/search cards/i);
+      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
       await user.type(searchInput, 'Author Two');
 
       expect(screen.queryByText('First quotation')).not.toBeInTheDocument();
@@ -182,7 +182,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const searchInput = screen.getByPlaceholderText(/search cards/i);
+      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
       await user.type(searchInput, 'Reference 3');
 
       expect(screen.queryByText('First quotation')).not.toBeInTheDocument();
@@ -194,7 +194,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const searchInput = screen.getByPlaceholderText(/search cards/i);
+      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
       await user.type(searchInput, 'FIRST');
 
       expect(screen.getByText('First quotation')).toBeInTheDocument();
@@ -202,21 +202,21 @@ describe('CardList', () => {
   });
 
   describe('sorting', () => {
-    it('should sort by next review date by default', () => {
+    it('should sort by date added (oldest first) by default', () => {
       render(<CardList cards={mockCards} showControls={true} />);
 
       const quotations = screen.getAllByText(/quotation/i);
-      expect(quotations[0].textContent).toContain('Third'); // 2025-01-08
-      expect(quotations[1].textContent).toContain('First'); // 2025-01-10
-      expect(quotations[2].textContent).toContain('Second'); // 2025-01-12
+      expect(quotations[0].textContent).toContain('First'); // 2025-01-01
+      expect(quotations[1].textContent).toContain('Second'); // 2025-01-02
+      expect(quotations[2].textContent).toContain('Third'); // 2025-01-03
     });
 
-    it('should sort by date added', async () => {
+    it('should sort by date added (newest first)', async () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const sortSelect = screen.getByDisplayValue(/sort by next review/i);
-      await user.selectOptions(sortSelect, 'timeAdded');
+      const sortSelect = screen.getByDisplayValue(/date added \(oldest first\)/i);
+      await user.selectOptions(sortSelect, 'timeAddedDesc');
 
       const quotations = screen.getAllByText(/quotation/i);
       // Sorted by date added descending (newest first)
@@ -229,7 +229,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const sortSelect = screen.getByDisplayValue(/sort by next review/i);
+      const sortSelect = screen.getByDisplayValue(/date added \(oldest first\)/i);
       await user.selectOptions(sortSelect, 'author');
 
       const quotations = screen.getAllByText(/quotation/i);
@@ -238,17 +238,17 @@ describe('CardList', () => {
       expect(quotations[2].textContent).toContain('Second'); // Author Two
     });
 
-    it('should sort by schedule', async () => {
+    it('should sort by author (Z-A)', async () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const sortSelect = screen.getByDisplayValue(/sort by next review/i);
-      await user.selectOptions(sortSelect, 'schedule');
+      const sortSelect = screen.getByDisplayValue(/date added \(oldest first\)/i);
+      await user.selectOptions(sortSelect, 'authorDesc');
 
       const quotations = screen.getAllByText(/quotation/i);
-      expect(quotations[0].textContent).toContain('First'); // daily
-      expect(quotations[1].textContent).toContain('Second'); // even
-      expect(quotations[2].textContent).toContain('Third'); // odd
+      expect(quotations[0].textContent).toContain('Second'); // Author Two
+      expect(quotations[1].textContent).toContain('Third'); // Author Three
+      expect(quotations[2].textContent).toContain('First'); // Author One
     });
   });
 
@@ -292,19 +292,19 @@ describe('CardList', () => {
   describe('controls visibility', () => {
     it('should show controls when showControls is true', () => {
       render(<CardList cards={mockCards} showControls={true} />);
-      expect(screen.getByPlaceholderText(/search cards/i)).toBeInTheDocument();
-      expect(screen.getByDisplayValue(/sort by/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/search by content, author, or source/i)).toBeInTheDocument();
+      expect(screen.getByDisplayValue(/date added/i)).toBeInTheDocument();
     });
 
     it('should hide controls when showControls is false', () => {
       render(<CardList cards={mockCards} showControls={false} />);
-      expect(screen.queryByPlaceholderText(/search cards/i)).not.toBeInTheDocument();
-      expect(screen.queryByDisplayValue(/sort by/i)).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText(/search by content, author, or source/i)).not.toBeInTheDocument();
+      expect(screen.queryByDisplayValue(/date added/i)).not.toBeInTheDocument();
     });
 
     it('should not show controls when there are no cards', () => {
       render(<CardList cards={[]} showControls={true} />);
-      expect(screen.queryByPlaceholderText(/search cards/i)).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText(/search by content, author, or source/i)).not.toBeInTheDocument();
     });
   });
 
@@ -315,7 +315,7 @@ describe('CardList', () => {
 
       expect(screen.getByText(/showing 3 of 3 cards/i)).toBeInTheDocument();
 
-      const searchInput = screen.getByPlaceholderText(/search cards/i);
+      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
       await user.type(searchInput, 'First');
 
       expect(screen.getByText(/showing 1 of 3 cards/i)).toBeInTheDocument();
@@ -323,7 +323,7 @@ describe('CardList', () => {
   });
 
   describe('overdue indicator', () => {
-    it('should mark overdue cards', () => {
+    it('should render cards with overdue nextReview dates', () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
 
@@ -336,9 +336,8 @@ describe('CardList', () => {
 
       render(<CardList cards={cardsWithOverdue} />);
 
-      // The date text should have the red color classes
-      const nextText = screen.getByText(/next:/i).closest('span');
-      expect(nextText).toHaveClass('text-red-600');
+      // Component should render the card (overdue visual indicator removed from current implementation)
+      expect(screen.getByText('First quotation')).toBeInTheDocument();
     });
   });
 
@@ -348,11 +347,11 @@ describe('CardList', () => {
       render(<CardList cards={mockCards} showControls={true} />);
 
       // First search for "quotation" (matches all)
-      const searchInput = screen.getByPlaceholderText(/search cards/i);
+      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
       await user.type(searchInput, 'quotation');
 
       // Then sort by author
-      const sortSelect = screen.getByDisplayValue(/sort by next review/i);
+      const sortSelect = screen.getByDisplayValue(/date added \(oldest first\)/i);
       await user.selectOptions(sortSelect, 'author');
 
       const quotations = screen.getAllByText(/quotation/i);

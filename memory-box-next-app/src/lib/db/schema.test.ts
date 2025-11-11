@@ -6,7 +6,7 @@ import {
   importData
 } from './schema';
 import { initializeDatabase } from './init';
-import type { Card, Box } from '../types';
+import type { Card } from '../types';
 
 describe('MemoryBoxDatabase', () => {
   let db: MemoryBoxDatabase;

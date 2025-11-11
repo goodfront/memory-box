@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { MemoryBoxDatabase } from './schema';
 import {
   createCard,
   getCard,
@@ -814,7 +813,7 @@ describe('Card CRUD Operations', () => {
 
         const card1 = await createCard({ quotation: 'Daily', schedule: 'daily' });
         const card2 = await createCard({ quotation: 'Even', schedule: 'even' });
-        const card3 = await createCard({ quotation: 'Not reviewed', schedule: 'odd' });
+        await createCard({ quotation: 'Not reviewed', schedule: 'odd' });
 
         const reviewDate1 = new Date('2024-01-14T10:00:00Z');
         const reviewDate2 = new Date('2024-01-15T10:00:00Z');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CardView } from '@/components/cards/CardView';
 import { getCard, deleteCard } from '@/lib/db/operations';
@@ -17,16 +17,7 @@ function ViewCardContent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    if (!id) {
-      setError('No card ID provided');
-      setLoading(false);
-      return;
-    }
-    loadCard();
-  }, [id]);
-
-  const loadCard = async () => {
+  const loadCard = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -44,7 +35,16 @@ function ViewCardContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) {
+      setError('No card ID provided');
+      setLoading(false);
+      return;
+    }
+    loadCard();
+  }, [id, loadCard]);
 
   const handleEdit = () => {
     router.push(`/cards/edit?id=${id}`);

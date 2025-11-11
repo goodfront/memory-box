@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CardView } from './CardView';
 import type { Card } from '@/lib/types';
-import * as schedulingUtils from '@/lib/utils/scheduling';
 
 // Mock the scheduling utils
 vi.mock('@/lib/utils/scheduling', () => ({

@@ -303,9 +303,9 @@ export default function DevToolsPage() {
             Usage Instructions
           </h3>
           <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-2 list-disc list-inside">
-            <li>Use "Inject Test Cards" to add diverse sample cards with different review schedules</li>
-            <li>Use "Inject Cards Due Today" to quickly populate your review session for testing</li>
-            <li>Use "Reset Database" when you want to start fresh with clean test data</li>
+            <li>Use &quot;Inject Test Cards&quot; to add diverse sample cards with different review schedules</li>
+            <li>Use &quot;Inject Cards Due Today&quot; to quickly populate your review session for testing</li>
+            <li>Use &quot;Reset Database&quot; when you want to start fresh with clean test data</li>
             <li>The summary updates automatically after each action</li>
             <li>Test cards include quotes from various authors with realistic review histories</li>
           </ul>

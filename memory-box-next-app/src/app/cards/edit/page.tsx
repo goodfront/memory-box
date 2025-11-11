@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CardForm } from '@/components/cards/CardForm';
 import { getCard, updateCard } from '@/lib/db/operations';
@@ -15,16 +15,7 @@ function EditCardContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!id) {
-      setError('No card ID provided');
-      setLoading(false);
-      return;
-    }
-    loadCard();
-  }, [id]);
-
-  const loadCard = async () => {
+  const loadCard = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -42,7 +33,16 @@ function EditCardContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) {
+      setError('No card ID provided');
+      setLoading(false);
+      return;
+    }
+    loadCard();
+  }, [id, loadCard]);
 
   const handleSubmit = async (data: UpdateCardInput) => {
     if (!id) return;
