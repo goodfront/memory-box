@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { injectTestCards, injectCardsDueToday, resetWithTestCards, getTestDataSummary } from '@/lib/db/testData';
+import { injectTestCards, injectCardsDueToday, injectOverdueCards, resetWithTestCards, getTestDataSummary } from '@/lib/db/testData';
 import { clearDatabase } from '@/lib/db/schema';
 
 interface Summary {
@@ -41,6 +41,21 @@ export default function DevToolsPage() {
       const newSummary = await getTestDataSummary();
       setSummary(newSummary);
       setMessage(`Successfully injected ${cards.length} cards due today!`);
+    } catch (error) {
+      setMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInjectOverdueCards = async () => {
+    setLoading(true);
+    setMessage('');
+    try {
+      const cards = await injectOverdueCards();
+      const newSummary = await getTestDataSummary();
+      setSummary(newSummary);
+      setMessage(`Successfully injected ${cards.length} overdue cards (7 weekly, 5 monthly)!`);
     } catch (error) {
       setMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
@@ -227,6 +242,24 @@ export default function DevToolsPage() {
                 20 Cards
               </button>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-4 rounded-lg border border-orange-200 dark:border-orange-900 bg-white dark:bg-zinc-950 p-6">
+            <div>
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+                Inject Overdue Cards
+              </h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Add overdue cards with weekly (7 cards) and monthly (5 cards) schedules to test the overdue modal.
+              </p>
+            </div>
+            <button
+              onClick={handleInjectOverdueCards}
+              disabled={loading}
+              className="w-full rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? 'Loading...' : 'Inject Overdue Cards'}
+            </button>
           </div>
 
           <div className="flex flex-col gap-4 rounded-lg border border-red-200 dark:border-red-900 bg-white dark:bg-zinc-950 p-6">

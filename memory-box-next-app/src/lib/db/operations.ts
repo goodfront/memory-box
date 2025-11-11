@@ -1,6 +1,6 @@
 import { db } from './schema';
 import type { Card, CreateCardInput, UpdateCardInput, BoxStatistics } from '../types';
-import { calculateNextReview } from '../utils/scheduling';
+import { calculateNextReview, doesScheduleMatchDate } from '../utils/scheduling';
 import { generateUUID } from '../utils/uuid';
 
 /**
@@ -57,18 +57,50 @@ export async function getCardsBySchedule(schedule: string): Promise<Card[]> {
 
 /**
  * Get cards due for review on a specific date
+ * Only returns cards whose schedule matches the given date
  * @param date The date to check (defaults to today)
- * @returns Array of cards due for review
+ * @returns Array of cards due for review that match the schedule for this date
  */
 export async function getCardsDueForReview(date: Date = new Date()): Promise<Card[]> {
   // Set time to end of day for comparison
   const endOfDay = new Date(date);
   endOfDay.setHours(23, 59, 59, 999);
 
-  return await db.cards
+  // Get all cards that are due (including overdue)
+  const dueCards = await db.cards
     .where('nextReview')
     .belowOrEqual(endOfDay)
     .toArray();
+
+  // Filter to only include cards whose schedule matches today's date
+  return dueCards.filter(card => doesScheduleMatchDate(card.schedule, date));
+}
+
+/**
+ * Get overdue cards (cards with nextReview before today)
+ * @param date The date to check against (defaults to today)
+ * @returns Object with weekly and monthly overdue cards
+ */
+export async function getOverdueCards(date: Date = new Date()): Promise<{
+  weekly: Card[];
+  monthly: Card[];
+}> {
+  // Set time to start of day for comparison
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const allOverdue = await db.cards
+    .where('nextReview')
+    .below(startOfDay)
+    .toArray();
+
+  const weeklySchedules = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const monthlySchedules = Array.from({ length: 31 }, (_, i) => String(i + 1));
+
+  const weekly = allOverdue.filter(card => weeklySchedules.includes(card.schedule));
+  const monthly = allOverdue.filter(card => monthlySchedules.includes(card.schedule));
+
+  return { weekly, monthly };
 }
 
 /**

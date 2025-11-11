@@ -189,6 +189,49 @@ export function getAllScheduleTypes(): Schedule[] {
 }
 
 /**
+ * Check if a schedule matches a specific date
+ * @param schedule The schedule type
+ * @param date The date to check (defaults to today)
+ * @returns True if the schedule matches the date
+ */
+export function doesScheduleMatchDate(schedule: Schedule, date: Date = new Date()): boolean {
+  const dayOfMonth = date.getDate();
+  const dayOfWeek = date.getDay();
+
+  // Check if schedule is a number (monthly schedule)
+  if (!isNaN(Number(schedule))) {
+    const monthlyDay = Number(schedule);
+    return dayOfMonth === monthlyDay;
+  }
+
+  // Handle named schedules
+  switch (schedule) {
+    case 'daily':
+      return true;
+    case 'even':
+      return dayOfMonth % 2 === 0;
+    case 'odd':
+      return dayOfMonth % 2 === 1;
+    case 'sunday':
+      return dayOfWeek === 0;
+    case 'monday':
+      return dayOfWeek === 1;
+    case 'tuesday':
+      return dayOfWeek === 2;
+    case 'wednesday':
+      return dayOfWeek === 3;
+    case 'thursday':
+      return dayOfWeek === 4;
+    case 'friday':
+      return dayOfWeek === 5;
+    case 'saturday':
+      return dayOfWeek === 6;
+    default:
+      return false;
+  }
+}
+
+/**
  * Get a short label for a schedule type
  * @param schedule The schedule type
  * @returns Short label string

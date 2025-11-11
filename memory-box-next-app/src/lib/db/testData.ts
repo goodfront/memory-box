@@ -241,6 +241,63 @@ export async function injectCardsDueToday(count: number = 5): Promise<Card[]> {
 }
 
 /**
+ * Inject overdue cards with both weekly and monthly schedules
+ * Useful for testing the overdue cards modal
+ */
+export async function injectOverdueCards(): Promise<Card[]> {
+  const now = new Date();
+  const cards: Card[] = [];
+
+  // Create overdue cards with weekly schedules (Sunday - Saturday)
+  const weeklySchedules: Schedule[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const weeklyQuotes = [
+    { quotation: 'The only impossible journey is the one you never begin.', author: 'Tony Robbins' },
+    { quotation: 'Life is what happens when you\'re busy making other plans.', author: 'John Lennon' },
+    { quotation: 'The way to get started is to quit talking and begin doing.', author: 'Walt Disney' },
+    { quotation: 'Don\'t let yesterday take up too much of today.', author: 'Will Rogers' },
+    { quotation: 'You learn more from failure than from success.', author: 'Unknown' },
+    { quotation: 'It\'s not whether you get knocked down, it\'s whether you get up.', author: 'Vince Lombardi' },
+    { quotation: 'The best time to plant a tree was 20 years ago. The second best time is now.', author: 'Chinese Proverb' }
+  ];
+
+  for (let i = 0; i < weeklySchedules.length; i++) {
+    const lastReviewedDate = addDays(now, -14); // 2 weeks ago
+    const card = await createTestCard({
+      ...weeklyQuotes[i],
+      schedule: weeklySchedules[i],
+      daysUntilReview: -7, // Overdue by 1 week
+      lastReviewed: lastReviewedDate,
+      reviewHistory: [lastReviewedDate]
+    });
+    cards.push(card);
+  }
+
+  // Create overdue cards with monthly schedules (days 1-31)
+  const monthlyQuotes = [
+    { quotation: 'Success is not final, failure is not fatal.', author: 'Winston Churchill' },
+    { quotation: 'Believe you can and you\'re halfway there.', author: 'Theodore Roosevelt' },
+    { quotation: 'The future belongs to those who believe in the beauty of their dreams.', author: 'Eleanor Roosevelt' },
+    { quotation: 'Strive not to be a success, but rather to be of value.', author: 'Albert Einstein' },
+    { quotation: 'The only limit to our realization of tomorrow is our doubts of today.', author: 'Franklin D. Roosevelt' }
+  ];
+
+  const monthlyDays = ['1', '5', '10', '15', '28'] as Schedule[];
+  for (let i = 0; i < monthlyDays.length; i++) {
+    const lastReviewedDate = addDays(now, -45); // 45 days ago
+    const card = await createTestCard({
+      ...monthlyQuotes[i],
+      schedule: monthlyDays[i],
+      daysUntilReview: -30, // Overdue by about 1 month
+      lastReviewed: lastReviewedDate,
+      reviewHistory: [lastReviewedDate]
+    });
+    cards.push(card);
+  }
+
+  return cards;
+}
+
+/**
  * Clear all cards and inject fresh test data
  */
 export async function resetWithTestCards(): Promise<Card[]> {

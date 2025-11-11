@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ReviewSession } from '@/components/review/ReviewSession';
-import { getCardsDueForReview } from '@/lib/db/operations';
+import { OverdueCardsModal } from '@/components/review/OverdueCardsModal';
+import { getCardsDueForReview, getOverdueCards } from '@/lib/db/operations';
 import type { Card } from '@/lib/types';
 
 export default function ReviewPage() {
@@ -11,21 +12,59 @@ export default function ReviewPage() {
   const [loading, setLoading] = useState(true);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
+  const [showOverdueModal, setShowOverdueModal] = useState(false);
+  const [overdueCards, setOverdueCards] = useState<{ weekly: Card[]; monthly: Card[] }>({
+    weekly: [],
+    monthly: []
+  });
 
   useEffect(() => {
-    loadDueCards();
+    void loadDueCards();
   }, []);
 
   async function loadDueCards() {
     try {
       setLoading(true);
       const dueCards = await getCardsDueForReview();
+      const overdue = await getOverdueCards();
+
       setCards(dueCards);
+      setOverdueCards(overdue);
+
+      // Show modal if there are overdue cards
+      if (overdue.weekly.length > 0 || overdue.monthly.length > 0) {
+        setShowOverdueModal(true);
+      }
     } catch (error) {
       console.error('Failed to load due cards:', error);
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleOverdueConfirm(includeWeekly: boolean, includeMonthly: boolean) {
+    const additionalCards: Card[] = [];
+
+    if (includeWeekly) {
+      additionalCards.push(...overdueCards.weekly);
+    }
+
+    if (includeMonthly) {
+      additionalCards.push(...overdueCards.monthly);
+    }
+
+    // Add overdue cards to the review session, avoiding duplicates
+    setCards(prevCards => {
+      const cardIds = new Set(prevCards.map(c => c.id));
+      const uniqueAdditional = additionalCards.filter(c => !cardIds.has(c.id));
+      return [...prevCards, ...uniqueAdditional];
+    });
+
+    setShowOverdueModal(false);
+  }
+
+  function handleOverdueCancel() {
+    setShowOverdueModal(false);
   }
 
   function handleCardReviewed() {
@@ -39,7 +78,7 @@ export default function ReviewPage() {
   function handleStartNewSession() {
     setSessionComplete(false);
     setReviewedCount(0);
-    loadDueCards();
+    void loadDueCards();
   }
 
   if (loading) {
@@ -86,17 +125,27 @@ export default function ReviewPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-          Review Session
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          {cards.length === 0
-            ? "No cards are due for review today."
-            : `You have ${cards.length} ${cards.length === 1 ? 'card' : 'cards'} to review today.`}
-        </p>
-      </div>
+    <>
+      {showOverdueModal && (
+        <OverdueCardsModal
+          weeklyCount={overdueCards.weekly.length}
+          monthlyCount={overdueCards.monthly.length}
+          onConfirm={handleOverdueConfirm}
+          onCancel={handleOverdueCancel}
+        />
+      )}
+
+      <div className="container mx-auto p-4 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+            Review Session
+          </h1>
+          <p className="text-zinc-600 dark:text-zinc-400">
+            {cards.length === 0
+              ? "No cards are due for review today."
+              : `You have ${cards.length} ${cards.length === 1 ? 'card' : 'cards'} to review today.`}
+          </p>
+        </div>
 
       {cards.length === 0 ? (
         <div className="text-center py-12 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800">
@@ -129,6 +178,7 @@ export default function ReviewPage() {
           onCardReviewed={handleCardReviewed}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 }

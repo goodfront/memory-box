@@ -5,6 +5,7 @@ import {
   getAllCards,
   getCardsBySchedule,
   getCardsDueForReview,
+  getOverdueCards,
   updateCard,
   markCardAsReviewed,
   deleteCard,
@@ -256,11 +257,11 @@ describe('Card CRUD Operations', () => {
     });
 
     it('should return multiple due cards', async () => {
-      const today = new Date('2024-01-15T10:00:00Z');
+      const today = new Date('2024-01-15T10:00:00Z'); // 15th is an odd day
 
       const card1 = await createCard({ quotation: 'Due 1', schedule: 'daily' });
-      const card2 = await createCard({ quotation: 'Due 2', schedule: 'even' });
-      const card3 = await createCard({ quotation: 'Not due', schedule: 'odd' });
+      const card2 = await createCard({ quotation: 'Due 2', schedule: 'odd' }); // Changed to 'odd' to match the 15th
+      const card3 = await createCard({ quotation: 'Not due', schedule: 'even' }); // Changed to 'even' which doesn't match
 
       await db.cards.update(card1.id, { nextReview: today });
       await db.cards.update(card2.id, { nextReview: today });
@@ -269,6 +270,156 @@ describe('Card CRUD Operations', () => {
       const dueCards = await getCardsDueForReview(today);
 
       expect(dueCards).toHaveLength(2);
+    });
+
+    it('should filter out overdue cards that do not match schedule', async () => {
+      const today = new Date('2024-01-16T10:00:00Z'); // 16th is an even day, Tuesday
+
+      // Create cards with different schedules
+      const card1 = await createCard({ quotation: 'Daily', schedule: 'daily' });
+      const card2 = await createCard({ quotation: 'Even', schedule: 'even' });
+      const card3 = await createCard({ quotation: 'Odd', schedule: 'odd' });
+      const card4 = await createCard({ quotation: 'Tuesday', schedule: 'tuesday' });
+      const card5 = await createCard({ quotation: 'Monday', schedule: 'monday' });
+
+      // Make all cards overdue
+      const overdueDate = new Date('2024-01-10T10:00:00Z');
+      await db.cards.update(card1.id, { nextReview: overdueDate });
+      await db.cards.update(card2.id, { nextReview: overdueDate });
+      await db.cards.update(card3.id, { nextReview: overdueDate });
+      await db.cards.update(card4.id, { nextReview: overdueDate });
+      await db.cards.update(card5.id, { nextReview: overdueDate });
+
+      const dueCards = await getCardsDueForReview(today);
+
+      // Should only return: daily, even, and tuesday
+      expect(dueCards).toHaveLength(3);
+      expect(dueCards.find(c => c.quotation === 'Daily')).toBeDefined();
+      expect(dueCards.find(c => c.quotation === 'Even')).toBeDefined();
+      expect(dueCards.find(c => c.quotation === 'Tuesday')).toBeDefined();
+      expect(dueCards.find(c => c.quotation === 'Odd')).toBeUndefined();
+      expect(dueCards.find(c => c.quotation === 'Monday')).toBeUndefined();
+    });
+  });
+
+  describe('getOverdueCards', () => {
+    it('should return empty arrays when no cards exist', async () => {
+      const overdue = await getOverdueCards();
+
+      expect(overdue.weekly).toHaveLength(0);
+      expect(overdue.monthly).toHaveLength(0);
+    });
+
+    it('should return empty arrays when no cards are overdue', async () => {
+      const futureDate = new Date('2024-12-31');
+      await createCard({ quotation: 'Future', schedule: 'daily' });
+      await db.cards.toCollection().modify({ nextReview: futureDate });
+
+      const overdue = await getOverdueCards(new Date('2024-01-15'));
+
+      expect(overdue.weekly).toHaveLength(0);
+      expect(overdue.monthly).toHaveLength(0);
+    });
+
+    it('should categorize weekly schedule overdue cards', async () => {
+      const today = new Date('2024-01-15T10:00:00Z');
+      const overdueDate = new Date('2024-01-10T10:00:00Z');
+
+      const card1 = await createCard({ quotation: 'Monday', schedule: 'monday' });
+      const card2 = await createCard({ quotation: 'Tuesday', schedule: 'tuesday' });
+      const card3 = await createCard({ quotation: 'Sunday', schedule: 'sunday' });
+
+      await db.cards.update(card1.id, { nextReview: overdueDate });
+      await db.cards.update(card2.id, { nextReview: overdueDate });
+      await db.cards.update(card3.id, { nextReview: overdueDate });
+
+      const overdue = await getOverdueCards(today);
+
+      expect(overdue.weekly).toHaveLength(3);
+      expect(overdue.monthly).toHaveLength(0);
+      expect(overdue.weekly.find(c => c.quotation === 'Monday')).toBeDefined();
+      expect(overdue.weekly.find(c => c.quotation === 'Tuesday')).toBeDefined();
+      expect(overdue.weekly.find(c => c.quotation === 'Sunday')).toBeDefined();
+    });
+
+    it('should categorize monthly schedule overdue cards', async () => {
+      const today = new Date('2024-01-15T10:00:00Z');
+      const overdueDate = new Date('2024-01-01T10:00:00Z');
+
+      const card1 = await createCard({ quotation: 'Day 1', schedule: '1' });
+      const card2 = await createCard({ quotation: 'Day 15', schedule: '15' });
+      const card3 = await createCard({ quotation: 'Day 31', schedule: '31' });
+
+      await db.cards.update(card1.id, { nextReview: overdueDate });
+      await db.cards.update(card2.id, { nextReview: overdueDate });
+      await db.cards.update(card3.id, { nextReview: overdueDate });
+
+      const overdue = await getOverdueCards(today);
+
+      expect(overdue.weekly).toHaveLength(0);
+      expect(overdue.monthly).toHaveLength(3);
+      expect(overdue.monthly.find(c => c.quotation === 'Day 1')).toBeDefined();
+      expect(overdue.monthly.find(c => c.quotation === 'Day 15')).toBeDefined();
+      expect(overdue.monthly.find(c => c.quotation === 'Day 31')).toBeDefined();
+    });
+
+    it('should categorize mixed weekly and monthly overdue cards', async () => {
+      const today = new Date('2024-01-20T10:00:00Z');
+      const overdueDate = new Date('2024-01-05T10:00:00Z');
+
+      const card1 = await createCard({ quotation: 'Monday', schedule: 'monday' });
+      const card2 = await createCard({ quotation: 'Friday', schedule: 'friday' });
+      const card3 = await createCard({ quotation: 'Day 10', schedule: '10' });
+      const card4 = await createCard({ quotation: 'Day 25', schedule: '25' });
+
+      await db.cards.update(card1.id, { nextReview: overdueDate });
+      await db.cards.update(card2.id, { nextReview: overdueDate });
+      await db.cards.update(card3.id, { nextReview: overdueDate });
+      await db.cards.update(card4.id, { nextReview: overdueDate });
+
+      const overdue = await getOverdueCards(today);
+
+      expect(overdue.weekly).toHaveLength(2);
+      expect(overdue.monthly).toHaveLength(2);
+      expect(overdue.weekly.find(c => c.quotation === 'Monday')).toBeDefined();
+      expect(overdue.weekly.find(c => c.quotation === 'Friday')).toBeDefined();
+      expect(overdue.monthly.find(c => c.quotation === 'Day 10')).toBeDefined();
+      expect(overdue.monthly.find(c => c.quotation === 'Day 25')).toBeDefined();
+    });
+
+    it('should not include daily, even, or odd schedules', async () => {
+      const today = new Date('2024-01-15T10:00:00Z');
+      const overdueDate = new Date('2024-01-10T10:00:00Z');
+
+      const card1 = await createCard({ quotation: 'Daily', schedule: 'daily' });
+      const card2 = await createCard({ quotation: 'Even', schedule: 'even' });
+      const card3 = await createCard({ quotation: 'Odd', schedule: 'odd' });
+
+      await db.cards.update(card1.id, { nextReview: overdueDate });
+      await db.cards.update(card2.id, { nextReview: overdueDate });
+      await db.cards.update(card3.id, { nextReview: overdueDate });
+
+      const overdue = await getOverdueCards(today);
+
+      expect(overdue.weekly).toHaveLength(0);
+      expect(overdue.monthly).toHaveLength(0);
+    });
+
+    it('should only return cards with nextReview before today', async () => {
+      const today = new Date('2024-01-15T10:00:00Z');
+      const overdueDate = new Date('2024-01-10T10:00:00Z');
+      const futureDate = new Date('2024-01-20T10:00:00Z');
+
+      const card1 = await createCard({ quotation: 'Overdue', schedule: 'monday' });
+      const card2 = await createCard({ quotation: 'Future', schedule: 'tuesday' });
+
+      await db.cards.update(card1.id, { nextReview: overdueDate });
+      await db.cards.update(card2.id, { nextReview: futureDate });
+
+      const overdue = await getOverdueCards(today);
+
+      expect(overdue.weekly).toHaveLength(1);
+      expect(overdue.weekly[0].quotation).toBe('Overdue');
     });
   });
 

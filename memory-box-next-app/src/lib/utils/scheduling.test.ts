@@ -10,7 +10,8 @@ import {
   isCardDue,
   getScheduleDescription,
   getAllScheduleTypes,
-  getScheduleLabel
+  getScheduleLabel,
+  doesScheduleMatchDate
 } from './scheduling';
 
 describe('addDays', () => {
@@ -385,5 +386,92 @@ describe('getScheduleLabel', () => {
       const schedule = String(i) as Schedule;
       expect(getScheduleLabel(schedule)).toBe(`${i}${expectedSuffixes[i]}`);
     }
+  });
+});
+
+describe('doesScheduleMatchDate', () => {
+  it('should match daily schedule on any date', () => {
+    expect(doesScheduleMatchDate('daily', new Date('2024-01-15'))).toBe(true);
+    expect(doesScheduleMatchDate('daily', new Date('2024-02-20'))).toBe(true);
+    expect(doesScheduleMatchDate('daily', new Date('2024-12-31'))).toBe(true);
+  });
+
+  it('should match even schedule only on even days', () => {
+    expect(doesScheduleMatchDate('even', new Date('2024-01-02T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('even', new Date('2024-01-04T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('even', new Date('2024-01-30T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('even', new Date('2024-01-01T12:00:00Z'))).toBe(false);
+    expect(doesScheduleMatchDate('even', new Date('2024-01-15T12:00:00Z'))).toBe(false);
+    expect(doesScheduleMatchDate('even', new Date('2024-01-31T12:00:00Z'))).toBe(false);
+  });
+
+  it('should match odd schedule only on odd days', () => {
+    expect(doesScheduleMatchDate('odd', new Date('2024-01-01T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('odd', new Date('2024-01-15T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('odd', new Date('2024-01-31T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('odd', new Date('2024-01-02T12:00:00Z'))).toBe(false);
+    expect(doesScheduleMatchDate('odd', new Date('2024-01-20T12:00:00Z'))).toBe(false);
+    expect(doesScheduleMatchDate('odd', new Date('2024-01-30T12:00:00Z'))).toBe(false);
+  });
+
+  it('should match weekday schedules correctly', () => {
+    // January 15, 2024 is a Monday
+    expect(doesScheduleMatchDate('monday', new Date('2024-01-15T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('tuesday', new Date('2024-01-15T12:00:00Z'))).toBe(false);
+
+    // January 16, 2024 is a Tuesday
+    expect(doesScheduleMatchDate('tuesday', new Date('2024-01-16T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('monday', new Date('2024-01-16T12:00:00Z'))).toBe(false);
+
+    // January 17, 2024 is a Wednesday
+    expect(doesScheduleMatchDate('wednesday', new Date('2024-01-17T12:00:00Z'))).toBe(true);
+
+    // January 18, 2024 is a Thursday
+    expect(doesScheduleMatchDate('thursday', new Date('2024-01-18T12:00:00Z'))).toBe(true);
+
+    // January 19, 2024 is a Friday
+    expect(doesScheduleMatchDate('friday', new Date('2024-01-19T12:00:00Z'))).toBe(true);
+
+    // January 20, 2024 is a Saturday
+    expect(doesScheduleMatchDate('saturday', new Date('2024-01-20T12:00:00Z'))).toBe(true);
+
+    // January 21, 2024 is a Sunday
+    expect(doesScheduleMatchDate('sunday', new Date('2024-01-21T12:00:00Z'))).toBe(true);
+  });
+
+  it('should match monthly schedule on correct day of month', () => {
+    expect(doesScheduleMatchDate('1', new Date('2024-01-01T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('15', new Date('2024-01-15T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('31', new Date('2024-01-31T12:00:00Z'))).toBe(true);
+
+    expect(doesScheduleMatchDate('1', new Date('2024-01-02T12:00:00Z'))).toBe(false);
+    expect(doesScheduleMatchDate('15', new Date('2024-01-16T12:00:00Z'))).toBe(false);
+    expect(doesScheduleMatchDate('31', new Date('2024-01-30T12:00:00Z'))).toBe(false);
+  });
+
+  it('should work across different months', () => {
+    expect(doesScheduleMatchDate('15', new Date('2024-01-15T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('15', new Date('2024-02-15T12:00:00Z'))).toBe(true);
+    expect(doesScheduleMatchDate('15', new Date('2024-12-15T12:00:00Z'))).toBe(true);
+  });
+
+  it('should handle edge case of day 31 in months without 31 days', () => {
+    // February doesn't have day 31
+    expect(doesScheduleMatchDate('31', new Date('2024-02-28T12:00:00Z'))).toBe(false);
+    expect(doesScheduleMatchDate('31', new Date('2024-02-29T12:00:00Z'))).toBe(false);
+
+    // April doesn't have day 31
+    expect(doesScheduleMatchDate('31', new Date('2024-04-30T12:00:00Z'))).toBe(false);
+  });
+
+  it('should use current date by default', () => {
+    const today = new Date();
+    const dayOfMonth = today.getDate();
+
+    // Test with a monthly schedule matching today
+    expect(doesScheduleMatchDate(String(dayOfMonth) as Schedule)).toBe(true);
+
+    // Test with daily which should always match
+    expect(doesScheduleMatchDate('daily')).toBe(true);
   });
 });
