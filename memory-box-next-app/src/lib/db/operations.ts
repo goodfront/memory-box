@@ -203,10 +203,11 @@ export async function getCardCountsBySchedule(): Promise<Record<string, number>>
 
 /**
  * Get count of cards due for review today
+ * @param date The date to check (defaults to today)
  * @returns Number of cards due today
  */
-export async function getDueCardsCount(): Promise<number> {
-  const dueCards = await getCardsDueForReview();
+export async function getDueCardsCount(date: Date = new Date()): Promise<number> {
+  const dueCards = await getCardsDueForReview(date);
   return dueCards.length;
 }
 
@@ -261,9 +262,10 @@ export async function getTotalReviewCount(): Promise<number> {
 /**
  * Get comprehensive box statistics
  * Provides an overview of all cards, reviews, and schedule distribution
+ * @param date The date to check for due cards (defaults to today)
  * @returns BoxStatistics object with aggregated data
  */
-export async function getBoxStatistics(): Promise<BoxStatistics> {
+export async function getBoxStatistics(date: Date = new Date()): Promise<BoxStatistics> {
   const [
     totalCards,
     cardsDue,
@@ -273,7 +275,7 @@ export async function getBoxStatistics(): Promise<BoxStatistics> {
     scheduleBreakdown
   ] = await Promise.all([
     getTotalCardCount(),
-    getDueCardsCount(),
+    getDueCardsCount(date),
     getCardsNeverReviewed().then(cards => cards.length),
     getTotalReviewCount(),
     getLastReviewDate(),

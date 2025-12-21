@@ -725,7 +725,8 @@ describe('Card CRUD Operations', () => {
     });
 
     it('should count cards due today', async () => {
-      const today = new Date();
+      // Use a specific even day to ensure the 'even' schedule matches
+      const today = new Date(2024, 0, 2); // January 2, 2024 (an even day)
 
       const card1 = await createCard({ quotation: 'Due 1', schedule: 'daily' });
       const card2 = await createCard({ quotation: 'Due 2', schedule: 'even' });
@@ -733,7 +734,7 @@ describe('Card CRUD Operations', () => {
       await db.cards.update(card1.id, { nextReview: today });
       await db.cards.update(card2.id, { nextReview: today });
 
-      const count = await getDueCardsCount();
+      const count = await getDueCardsCount(today);
 
       expect(count).toBe(2);
     });
