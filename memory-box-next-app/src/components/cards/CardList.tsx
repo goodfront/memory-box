@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import type { Card, Schedule } from '@/lib/types';
 import { getScheduleLabel } from '@/lib/utils/scheduling';
 
@@ -221,14 +222,8 @@ export function CardList({
         </div>
       ) : (
         <div className="space-y-3">
-          {filteredAndSortedCards.map((card) => (
-            <div
-              key={card.id}
-              onClick={() => onCardClick?.(card)}
-              className={`rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 ${
-                onCardClick ? 'cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all' : ''
-              }`}
-            >
+          {filteredAndSortedCards.map((card) => {
+            const cardElement = (
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   {/* Card Content */}
@@ -260,8 +255,33 @@ export function CardList({
                   Added {formatDate(card.timeAdded)}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+
+            // If onCardClick is provided, wrap in Link for better offline support
+            // Link components work better offline because they can fall back to full page loads
+            if (onCardClick) {
+              return (
+                <Link
+                  key={card.id}
+                  href={`/cards/view?id=${card.id}`}
+                  onClick={() => onCardClick(card)}
+                  className="block rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md transition-all"
+                >
+                  {cardElement}
+                </Link>
+              );
+            }
+
+            // If no onClick handler, just render the card
+            return (
+              <div
+                key={card.id}
+                className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4"
+              >
+                {cardElement}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

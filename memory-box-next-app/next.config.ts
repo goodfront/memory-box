@@ -8,7 +8,7 @@ const withPWA = withPWAInit({
   reloadOnOnline: true,
   disable: false,
   workboxOptions: {
-    disableDevLogs: true,
+    disableDevLogs: false,
     // Don't skip waiting - activate immediately
     skipWaiting: true,
     clientsClaim: true,
@@ -16,10 +16,19 @@ const withPWA = withPWAInit({
     additionalManifestEntries: [
       { url: "/", revision: null },
       { url: "/box", revision: null },
+      { url: "/box.html", revision: null },
       { url: "/cards", revision: null },
+      { url: "/cards.html", revision: null },
       { url: "/cards/new", revision: null },
+      { url: "/cards/new.html", revision: null },
+      { url: "/cards/edit", revision: null },
+      { url: "/cards/edit.html", revision: null },
+      { url: "/cards/view", revision: null },
+      { url: "/cards/view.html", revision: null },
       { url: "/review", revision: null },
+      { url: "/review.html", revision: null },
       { url: "/offline", revision: null },
+      { url: "/offline.html", revision: null },
     ],
     runtimeCaching: [
       {
@@ -100,7 +109,8 @@ const withPWA = withPWAInit({
         },
       },
       {
-        // Cache HTML pages - try network with fast fallback to cache
+        // Cache HTML pages - CacheFirst for instant offline loading
+        // Since all data comes from IndexedDB, cached HTML is always valid
         urlPattern: ({ url, sameOrigin, request }) => {
           return (
             sameOrigin &&
@@ -108,18 +118,47 @@ const withPWA = withPWAInit({
             request.destination === "document"
           );
         },
-        handler: "NetworkFirst",
+        handler: "CacheFirst",
         options: {
           cacheName: "pages-html",
           expiration: {
             maxEntries: 50,
             maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
           },
-          networkTimeoutSeconds: 2, // Fast fallback to cache
+          // Update cache in background when online for freshness
+          plugins: [
+            {
+              // When fetching from cache, try without query params if not found
+              cachedResponseWillBeUsed: async ({ cacheName, request, cachedResponse }) => {
+                // If we found a cached response, return it
+                if (cachedResponse) {
+                  return cachedResponse;
+                }
+
+                // If not found and URL has query params, try without them
+                const url = new URL(request.url);
+                if (url.search) {
+                  const cache = await caches.open(cacheName);
+                  // Try base path
+                  let response = await cache.match(url.pathname);
+                  if (!response) {
+                    // Try with .html extension
+                    response = await cache.match(`${url.pathname}.html`);
+                  }
+                  if (response) {
+                    return response;
+                  }
+                }
+
+                return null;
+              }
+            }
+          ]
         },
       },
       {
         // Cache RSC (React Server Components) payloads for client-side navigation
+        // Use CacheFirst for instant offline navigation
         urlPattern: ({ url, sameOrigin, request }) => {
           return (
             sameOrigin &&
@@ -129,14 +168,13 @@ const withPWA = withPWAInit({
              url.searchParams.has("_rsc"))
           );
         },
-        handler: "NetworkFirst",
+        handler: "CacheFirst",
         options: {
           cacheName: "pages-rsc",
           expiration: {
-            maxEntries: 50,
+            maxEntries: 100, // Increased to cache more card views
             maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
           },
-          networkTimeoutSeconds: 2,
         },
       },
       {
@@ -144,14 +182,13 @@ const withPWA = withPWAInit({
         urlPattern: ({ url, sameOrigin }) => {
           return sameOrigin && !url.pathname.startsWith("/api/");
         },
-        handler: "NetworkFirst",
+        handler: "CacheFirst",
         options: {
           cacheName: "pages-other",
           expiration: {
             maxEntries: 50,
-            maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
           },
-          networkTimeoutSeconds: 2,
         },
       },
     ],
