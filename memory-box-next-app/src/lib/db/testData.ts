@@ -27,7 +27,11 @@ const SAMPLE_QUOTATIONS = [
     reference: 'They Call Me Coach'
   },
   {
-    quotation: 'Education is an atmosphere, a discipline, a life.',
+    quotation: `Education is an atmosphere, a discipline, a life.
+
+The atmosphere is that which surrounds the child, the environment in which he lives. It is not a thing made, but a condition of things which ministers to his development. The discipline is not the rod, but a way of life, in which certain habits are cultivated and others are not allowed.
+
+The life must needs be one in which there is no place for idleness, self-indulgence, or discontent, but where joy, usefulness, and contentment are the habit of the spirit.`,
     author: 'Charlotte Mason',
     reference: 'Volume 6, p. 26'
   },
@@ -37,7 +41,11 @@ const SAMPLE_QUOTATIONS = [
     reference: undefined
   },
   {
-    quotation: 'In learning you will teach, and in teaching you will learn.',
+    quotation: `In learning you will teach, and in teaching you will learn.
+
+This is the great mystery of teaching and learning - that they are not separate activities but two sides of the same coin. The teacher who thinks he has nothing left to learn has ceased to be a teacher in the truest sense.
+
+Every student brings something unique to the learning space, and in the act of helping them understand, we ourselves come to understand more deeply. The questions they ask force us to examine what we thought we knew. Their struggles reveal gaps in our own knowledge.`,
     author: 'Phil Collins',
     reference: 'Son of Man'
   },
@@ -47,7 +55,11 @@ const SAMPLE_QUOTATIONS = [
     reference: undefined
   },
   {
-    quotation: 'Children are born persons.',
+    quotation: `Children are born persons.
+
+They are not blank slates waiting to be written upon, nor clay to be molded into whatever shape we desire. They come into the world with their own personalities, their own wills, their own spiritual natures.
+
+Our job as parents and teachers is not to make them into something they are not, but to provide the conditions in which they can grow into the fullness of what they already are. We must respect their personhood from the very beginning.`,
     author: 'Charlotte Mason',
     reference: 'Volume 2, p. 3'
   },
@@ -57,12 +69,20 @@ const SAMPLE_QUOTATIONS = [
     reference: undefined
   },
   {
-    quotation: 'The only way to do great work is to love what you do.',
+    quotation: `The only way to do great work is to love what you do.
+
+If you haven't found it yet, keep looking. Don't settle. As with all matters of the heart, you'll know when you find it. And, like any great relationship, it just gets better and better as the years roll on.
+
+So keep looking until you find it. Don't settle. Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work.`,
     author: 'Steve Jobs',
     reference: 'Stanford Commencement, 2005'
   },
   {
-    quotation: 'Wisdom begins in wonder.',
+    quotation: `Wisdom begins in wonder.
+
+The sense of wonder is the beginning of philosophy, the beginning of all true knowledge. When we cease to wonder, we cease to learn. The child who asks "Why?" incessantly is not being tiresome, but is exhibiting the first stirrings of the philosophical mind.
+
+Wonder opens the door to investigation, and investigation leads to understanding. But the wonder must come first. Without it, all our learning becomes mere accumulation of facts, without meaning or connection to life itself.`,
     author: 'Socrates',
     reference: undefined
   },

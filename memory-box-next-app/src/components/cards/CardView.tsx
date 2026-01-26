@@ -79,7 +79,7 @@ export function CardView({
               </button>
             </div>
             {isQuotationVisible ? (
-              <blockquote className="text-lg leading-relaxed text-zinc-900 dark:text-zinc-100 italic border-l-4 border-indigo-500 pl-4 py-2 whitespace-pre-line">
+              <blockquote className="text-lg leading-relaxed text-zinc-900 dark:text-zinc-100 italic border-l-4 border-indigo-500 pl-4 py-2 whitespace-pre-wrap">
                 {card.quotation}
               </blockquote>
             ) : (
@@ -91,7 +91,7 @@ export function CardView({
             )}
           </div>
         ) : (
-          <blockquote className="text-lg leading-relaxed text-zinc-900 dark:text-zinc-100 italic border-l-4 border-indigo-500 pl-4 py-2 mb-6 whitespace-pre-line">
+          <blockquote className="text-lg leading-relaxed text-zinc-900 dark:text-zinc-100 italic border-l-4 border-indigo-500 pl-4 py-2 mb-6 whitespace-pre-wrap">
             {card.quotation}
           </blockquote>
         )}

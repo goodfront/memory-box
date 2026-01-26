@@ -228,7 +228,7 @@ export function CardList({
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   {/* Card Content */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-zinc-900 dark:text-zinc-100 mb-2 leading-relaxed">
+                    <p className="text-zinc-900 dark:text-zinc-100 mb-2 leading-relaxed whitespace-pre-wrap">
                       {truncateText(card.quotation)}
                     </p>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-zinc-600 dark:text-zinc-400">
