@@ -7,6 +7,7 @@ export function ServiceWorkerProvider() {
     if (
       typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&
+      navigator.serviceWorker &&
       process.env.NODE_ENV === 'production'
     ) {
       // Register service worker

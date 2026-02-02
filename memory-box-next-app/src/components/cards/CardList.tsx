@@ -161,7 +161,7 @@ export function CardList({
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Search by content, author, or source..."
+              placeholder="Search cards by content, author, or source..."
               value={searchTerm}
               onChange={(e) => {
                 const value = e.target.value;
@@ -174,6 +174,7 @@ export function CardList({
 
           {/* Sort */}
           <select
+            aria-label="Sort by"
             value={sortBy}
             onChange={(e) => {
               const value = e.target.value as SortOption;
@@ -190,6 +191,7 @@ export function CardList({
 
           {/* Filter by Schedule */}
           <select
+            aria-label="Filter by schedule"
             value={filterSchedule}
             onChange={(e) => {
               const value = e.target.value as Schedule | 'all';

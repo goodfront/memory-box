@@ -158,7 +158,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
+      const searchInput = screen.getByPlaceholderText(/search cards by content, author, or source/i);
       await user.type(searchInput, 'First');
 
       expect(screen.getByText('First quotation')).toBeInTheDocument();
@@ -170,7 +170,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
+      const searchInput = screen.getByPlaceholderText(/search cards by content, author, or source/i);
       await user.type(searchInput, 'Author Two');
 
       expect(screen.queryByText('First quotation')).not.toBeInTheDocument();
@@ -182,7 +182,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
+      const searchInput = screen.getByPlaceholderText(/search cards by content, author, or source/i);
       await user.type(searchInput, 'Reference 3');
 
       expect(screen.queryByText('First quotation')).not.toBeInTheDocument();
@@ -194,7 +194,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
+      const searchInput = screen.getByPlaceholderText(/search cards by content, author, or source/i);
       await user.type(searchInput, 'FIRST');
 
       expect(screen.getByText('First quotation')).toBeInTheDocument();
@@ -292,19 +292,19 @@ describe('CardList', () => {
   describe('controls visibility', () => {
     it('should show controls when showControls is true', () => {
       render(<CardList cards={mockCards} showControls={true} />);
-      expect(screen.getByPlaceholderText(/search by content, author, or source/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/search cards by content, author, or source/i)).toBeInTheDocument();
       expect(screen.getByDisplayValue(/date added/i)).toBeInTheDocument();
     });
 
     it('should hide controls when showControls is false', () => {
       render(<CardList cards={mockCards} showControls={false} />);
-      expect(screen.queryByPlaceholderText(/search by content, author, or source/i)).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText(/search cards by content, author, or source/i)).not.toBeInTheDocument();
       expect(screen.queryByDisplayValue(/date added/i)).not.toBeInTheDocument();
     });
 
     it('should not show controls when there are no cards', () => {
       render(<CardList cards={[]} showControls={true} />);
-      expect(screen.queryByPlaceholderText(/search by content, author, or source/i)).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText(/search cards by content, author, or source/i)).not.toBeInTheDocument();
     });
   });
 
@@ -315,7 +315,7 @@ describe('CardList', () => {
 
       expect(screen.getByText(/showing 3 of 3 cards/i)).toBeInTheDocument();
 
-      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
+      const searchInput = screen.getByPlaceholderText(/search cards by content, author, or source/i);
       await user.type(searchInput, 'First');
 
       expect(screen.getByText(/showing 1 of 3 cards/i)).toBeInTheDocument();
@@ -347,7 +347,7 @@ describe('CardList', () => {
       render(<CardList cards={mockCards} showControls={true} />);
 
       // First search for "quotation" (matches all)
-      const searchInput = screen.getByPlaceholderText(/search by content, author, or source/i);
+      const searchInput = screen.getByPlaceholderText(/search cards by content, author, or source/i);
       await user.type(searchInput, 'quotation');
 
       // Then sort by author

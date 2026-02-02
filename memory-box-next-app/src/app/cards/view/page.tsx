@@ -24,11 +24,7 @@ function ViewCardContent() {
       setLoading(true);
       setError(null);
       const fetchedCard = await getCard(id);
-      if (!fetchedCard) {
-        setError('Card not found');
-      } else {
-        setCard(fetchedCard);
-      }
+      setCard(fetchedCard || null);
     } catch (err) {
       console.error('Error loading card:', err);
       setError(err instanceof Error ? err.message : 'Failed to load card');
@@ -83,7 +79,7 @@ function ViewCardContent() {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
+          <div className="text-center" role="status" aria-live="polite">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent mb-4"></div>
             <p className="text-zinc-600 dark:text-zinc-400">Loading card...</p>
           </div>
@@ -201,7 +197,7 @@ export default function ViewCardPage() {
     <Suspense fallback={
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
+          <div className="text-center" role="status" aria-live="polite">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent mb-4"></div>
             <p className="text-zinc-600 dark:text-zinc-400">Loading card...</p>
           </div>
