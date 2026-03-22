@@ -199,8 +199,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? '/memory-box' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/memory-box' : '',
+  // No basePath needed for custom domain
   images: {
     unoptimized: true, // Required for static export
   },
