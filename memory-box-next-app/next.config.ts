@@ -199,6 +199,11 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   output: 'export',
+  basePath: process.env.NODE_ENV === 'production' ? '/memory-box' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/memory-box' : '',
+  images: {
+    unoptimized: true, // Required for static export
+  },
   turbopack: {}, // Silence Turbopack warning for PWA webpack config
 };
 
