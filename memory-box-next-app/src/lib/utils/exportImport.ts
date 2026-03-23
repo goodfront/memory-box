@@ -3,13 +3,113 @@
  */
 
 import { exportData, importData, mergeImportData } from '../db/schema';
-import type { Card, Box } from '../types';
+import type { Card, Box, Schedule } from '../types';
 
+/**
+ * Card with dates serialized as strings (for JSON export)
+ */
+export interface CardSerialized {
+  id: string;
+  quotation: string;
+  author?: string;
+  reference?: string;
+  schedule: Schedule;
+  timeAdded: string;
+  timeModified: string;
+  lastReviewed?: string;
+  nextReview: string;
+  reviewHistory: string[];
+}
+
+/**
+ * Box with dates serialized as strings (for JSON export)
+ */
+export interface BoxSerialized {
+  id: string;
+  name: string;
+  createdAt: string;
+  modifiedAt: string;
+}
+
+/**
+ * Export data structure with serialized dates
+ */
 export interface ExportData {
   version: string;
   exportDate: string;
-  cards: Card[];
-  boxes: Box[];
+  cards: CardSerialized[];
+  boxes: BoxSerialized[];
+}
+
+/**
+ * Convert date strings in a card object to Date objects
+ * @param card Card with date strings
+ * @returns Card with Date objects
+ */
+export function processCardDates(card: CardSerialized): Card {
+  return {
+    ...card,
+    timeAdded: new Date(card.timeAdded),
+    timeModified: new Date(card.timeModified),
+    lastReviewed: card.lastReviewed ? new Date(card.lastReviewed) : undefined,
+    nextReview: new Date(card.nextReview),
+    reviewHistory: card.reviewHistory.map(date => new Date(date))
+  };
+}
+
+/**
+ * Convert date strings in a box object to Date objects
+ * @param box Box with date strings
+ * @returns Box with Date objects
+ */
+export function processBoxDates(box: BoxSerialized): Box {
+  return {
+    ...box,
+    createdAt: new Date(box.createdAt),
+    modifiedAt: new Date(box.modifiedAt)
+  };
+}
+
+/**
+ * Validate the structure of an import data object
+ * @param importObject The object to validate
+ * @returns Validation result
+ */
+export function validateImportDataStructure(importObject: unknown): {
+  valid: boolean;
+  error?: string;
+  data?: ExportData;
+} {
+  // Type guard to check if it's an object
+  if (!importObject || typeof importObject !== 'object') {
+    return { valid: false, error: 'Import data must be an object' };
+  }
+
+  const data = importObject as Partial<ExportData>;
+
+  // Check for required fields
+  if (!data.cards || !Array.isArray(data.cards)) {
+    return { valid: false, error: 'Invalid import file: missing or invalid cards array' };
+  }
+  if (!data.boxes || !Array.isArray(data.boxes)) {
+    return { valid: false, error: 'Invalid import file: missing or invalid boxes array' };
+  }
+
+  // Validate card structure (spot check first card if exists)
+  if (data.cards.length > 0) {
+    const firstCard = data.cards[0];
+    const requiredCardFields = ['id', 'quotation', 'schedule', 'timeAdded', 'timeModified', 'nextReview'];
+    const missingFields = requiredCardFields.filter(field => !(field in firstCard));
+
+    if (missingFields.length > 0) {
+      return {
+        valid: false,
+        error: `Invalid card structure: missing fields ${missingFields.join(', ')}`
+      };
+    }
+  }
+
+  return { valid: true, data: data as ExportData };
 }
 
 /**
@@ -21,14 +121,15 @@ export async function exportDatabaseToFile(): Promise<void> {
     const data = await exportData();
 
     // Create export object with metadata
-    const exportObject: ExportData = {
+    // Note: JSON.stringify will automatically convert Date objects to ISO strings
+    const exportObject = {
       version: '1.0',
       exportDate: new Date().toISOString(),
       cards: data.cards,
       boxes: data.boxes
     };
 
-    // Convert to JSON string
+    // Convert to JSON string (Date objects will be serialized to strings)
     const jsonString = JSON.stringify(exportObject, null, 2);
 
     // Create blob and download link
@@ -68,28 +169,14 @@ export async function importDatabaseFromFile(file: File): Promise<{
         const importObject: ExportData = JSON.parse(jsonString);
 
         // Validate the import object structure
-        if (!importObject.cards || !Array.isArray(importObject.cards)) {
-          throw new Error('Invalid import file: missing or invalid cards array');
-        }
-        if (!importObject.boxes || !Array.isArray(importObject.boxes)) {
-          throw new Error('Invalid import file: missing or invalid boxes array');
+        const validation = validateImportDataStructure(importObject);
+        if (!validation.valid || !validation.data) {
+          throw new Error(validation.error);
         }
 
         // Convert date strings back to Date objects
-        const processedCards = importObject.cards.map(card => ({
-          ...card,
-          timeAdded: new Date(card.timeAdded),
-          timeModified: new Date(card.timeModified),
-          lastReviewed: card.lastReviewed ? new Date(card.lastReviewed) : undefined,
-          nextReview: new Date(card.nextReview),
-          reviewHistory: card.reviewHistory.map(date => new Date(date))
-        }));
-
-        const processedBoxes = importObject.boxes.map(box => ({
-          ...box,
-          createdAt: new Date(box.createdAt),
-          modifiedAt: new Date(box.modifiedAt)
-        }));
+        const processedCards = validation.data.cards.map(processCardDates);
+        const processedBoxes = validation.data.boxes.map(processBoxDates);
 
         // Import the data
         await importData({
@@ -137,28 +224,14 @@ export async function importDatabaseFromFileMerge(file: File): Promise<{
         const importObject: ExportData = JSON.parse(jsonString);
 
         // Validate the import object structure
-        if (!importObject.cards || !Array.isArray(importObject.cards)) {
-          throw new Error('Invalid import file: missing or invalid cards array');
-        }
-        if (!importObject.boxes || !Array.isArray(importObject.boxes)) {
-          throw new Error('Invalid import file: missing or invalid boxes array');
+        const validation = validateImportDataStructure(importObject);
+        if (!validation.valid || !validation.data) {
+          throw new Error(validation.error);
         }
 
         // Convert date strings back to Date objects
-        const processedCards = importObject.cards.map(card => ({
-          ...card,
-          timeAdded: new Date(card.timeAdded),
-          timeModified: new Date(card.timeModified),
-          lastReviewed: card.lastReviewed ? new Date(card.lastReviewed) : undefined,
-          nextReview: new Date(card.nextReview),
-          reviewHistory: card.reviewHistory.map(date => new Date(date))
-        }));
-
-        const processedBoxes = importObject.boxes.map(box => ({
-          ...box,
-          createdAt: new Date(box.createdAt),
-          modifiedAt: new Date(box.modifiedAt)
-        }));
+        const processedCards = validation.data.cards.map(processCardDates);
+        const processedBoxes = validation.data.boxes.map(processBoxDates);
 
         // Merge import the data
         const stats = await mergeImportData({
@@ -203,38 +276,20 @@ export async function validateImportFile(file: File): Promise<{
         const jsonString = event.target?.result as string;
         const importObject: ExportData = JSON.parse(jsonString);
 
-        // Check for required fields
-        if (!importObject.cards || !Array.isArray(importObject.cards)) {
-          resolve({ valid: false, error: 'Missing or invalid cards array' });
+        // Validate structure
+        const validation = validateImportDataStructure(importObject);
+        if (!validation.valid || !validation.data) {
+          resolve({ valid: false, error: validation.error });
           return;
-        }
-        if (!importObject.boxes || !Array.isArray(importObject.boxes)) {
-          resolve({ valid: false, error: 'Missing or invalid boxes array' });
-          return;
-        }
-
-        // Validate card structure (spot check first card if exists)
-        if (importObject.cards.length > 0) {
-          const firstCard = importObject.cards[0];
-          const requiredCardFields = ['id', 'quotation', 'schedule', 'timeAdded', 'timeModified', 'nextReview'];
-          const missingFields = requiredCardFields.filter(field => !(field in firstCard));
-
-          if (missingFields.length > 0) {
-            resolve({
-              valid: false,
-              error: `Invalid card structure: missing fields ${missingFields.join(', ')}`
-            });
-            return;
-          }
         }
 
         resolve({
           valid: true,
           stats: {
-            cardCount: importObject.cards.length,
-            boxCount: importObject.boxes.length,
-            exportDate: importObject.exportDate,
-            version: importObject.version
+            cardCount: validation.data.cards.length,
+            boxCount: validation.data.boxes.length,
+            exportDate: validation.data.exportDate,
+            version: validation.data.version
           }
         });
       } catch (error) {
