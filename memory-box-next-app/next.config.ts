@@ -109,8 +109,8 @@ const withPWA = withPWAInit({
         },
       },
       {
-        // Cache HTML pages - CacheFirst for instant offline loading
-        // Since all data comes from IndexedDB, cached HTML is always valid
+        // Cache HTML pages - NetworkFirst ensures fresh content when online
+        // Falls back to cache when offline
         urlPattern: ({ url, sameOrigin, request }) => {
           return (
             sameOrigin &&
@@ -118,14 +118,14 @@ const withPWA = withPWAInit({
             request.destination === "document"
           );
         },
-        handler: "CacheFirst",
+        handler: "NetworkFirst",
         options: {
           cacheName: "pages-html",
+          networkTimeoutSeconds: 3, // Fall back to cache after 3 seconds
           expiration: {
             maxEntries: 50,
             maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
           },
-          // Update cache in background when online for freshness
           plugins: [
             {
               // When fetching from cache, try without query params if not found
@@ -158,7 +158,7 @@ const withPWA = withPWAInit({
       },
       {
         // Cache RSC (React Server Components) payloads for client-side navigation
-        // Use CacheFirst for instant offline navigation
+        // NetworkFirst ensures fresh navigation data when online
         urlPattern: ({ url, sameOrigin, request }) => {
           return (
             sameOrigin &&
@@ -168,9 +168,10 @@ const withPWA = withPWAInit({
              url.searchParams.has("_rsc"))
           );
         },
-        handler: "CacheFirst",
+        handler: "NetworkFirst",
         options: {
           cacheName: "pages-rsc",
+          networkTimeoutSeconds: 3, // Fall back to cache after 3 seconds
           expiration: {
             maxEntries: 100, // Increased to cache more card views
             maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days

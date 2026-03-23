@@ -2,6 +2,7 @@
   "name": "Memory Box - Memorization System",
   "short_name": "Memory Box",
   "description": "A system for memorizing quotations using spaced repetition",
+  "version": "0.1.0",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
