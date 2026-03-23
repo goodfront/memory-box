@@ -66,7 +66,7 @@ export function CardList({
   showControls = true,
   emptyMessage = 'No cards found',
   initialSearchTerm = '',
-  initialSortBy = 'timeAdded',
+  initialSortBy = 'timeAddedDesc',
   initialFilterSchedule = 'all',
   onSearchChange,
   onSortChange,
