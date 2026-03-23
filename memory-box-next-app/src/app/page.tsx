@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import ExportImportSection from "@/components/dev/ExportImportSection";
 
 export default function Home() {
   return (
@@ -63,6 +64,21 @@ export default function Home() {
               View schedule levels and card counts
             </p>
           </Link>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950 p-4">
+            <h2 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2">
+              Important: Your Data is Stored Locally
+            </h2>
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              All your cards are saved in your browser&apos;s local storage, not on any server.
+              This means your data only exists on this device. We strongly recommend exporting
+              a backup after adding or updating cards to prevent data loss.
+            </p>
+          </div>
+
+          <ExportImportSection />
         </div>
       </div>
     </div>

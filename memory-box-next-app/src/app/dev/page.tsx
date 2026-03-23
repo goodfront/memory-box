@@ -351,7 +351,8 @@ export default function DevToolsPage() {
           </h3>
           <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-2 list-disc list-inside">
             <li>Use &quot;Export Database&quot; to create a backup of all your cards and boxes as a JSON file</li>
-            <li>Use &quot;Import Database&quot; to restore from a backup file (this will replace all current data)</li>
+            <li>Use &quot;Merge Import&quot; to add new cards and update existing ones by ID while preserving cards not in the backup</li>
+            <li>Use &quot;Replace Import&quot; to restore from a backup file (this will delete all current data and replace it)</li>
             <li>Use &quot;Inject Test Cards&quot; to add diverse sample cards with different review schedules</li>
             <li>Use &quot;Inject Cards Due Today&quot; to quickly populate your review session for testing</li>
             <li>Use &quot;Reset Database&quot; when you want to start fresh with clean test data</li>

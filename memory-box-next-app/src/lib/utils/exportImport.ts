@@ -2,7 +2,7 @@
  * Utility functions for exporting and importing database data
  */
 
-import { exportData, importData } from '../db/schema';
+import { exportData, importData, mergeImportData } from '../db/schema';
 import type { Card, Box } from '../types';
 
 export interface ExportData {
@@ -103,6 +103,72 @@ export async function importDatabaseFromFile(file: File): Promise<{
         });
       } catch (error) {
         reject(new Error(`Failed to import data: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      }
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+
+    reader.readAsText(file);
+  });
+}
+
+/**
+ * Import database data from a JSON file with merge (preserve existing data)
+ * - Adds new cards with IDs that don't exist
+ * - Updates cards with matching IDs
+ * - Preserves cards not in the import file
+ * @param file The file to import
+ * @returns Statistics about the import
+ */
+export async function importDatabaseFromFileMerge(file: File): Promise<{
+  cardsAdded: number;
+  cardsUpdated: number;
+  boxesAdded: number;
+  boxesUpdated: number;
+}> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = async (event) => {
+      try {
+        const jsonString = event.target?.result as string;
+        const importObject: ExportData = JSON.parse(jsonString);
+
+        // Validate the import object structure
+        if (!importObject.cards || !Array.isArray(importObject.cards)) {
+          throw new Error('Invalid import file: missing or invalid cards array');
+        }
+        if (!importObject.boxes || !Array.isArray(importObject.boxes)) {
+          throw new Error('Invalid import file: missing or invalid boxes array');
+        }
+
+        // Convert date strings back to Date objects
+        const processedCards = importObject.cards.map(card => ({
+          ...card,
+          timeAdded: new Date(card.timeAdded),
+          timeModified: new Date(card.timeModified),
+          lastReviewed: card.lastReviewed ? new Date(card.lastReviewed) : undefined,
+          nextReview: new Date(card.nextReview),
+          reviewHistory: card.reviewHistory.map(date => new Date(date))
+        }));
+
+        const processedBoxes = importObject.boxes.map(box => ({
+          ...box,
+          createdAt: new Date(box.createdAt),
+          modifiedAt: new Date(box.modifiedAt)
+        }));
+
+        // Merge import the data
+        const stats = await mergeImportData({
+          cards: processedCards,
+          boxes: processedBoxes
+        });
+
+        resolve(stats);
+      } catch (error) {
+        reject(new Error(`Failed to merge import data: ${error instanceof Error ? error.message : 'Unknown error'}`));
       }
     };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { exportDatabaseToFile, importDatabaseFromFile, validateImportFile } from '@/lib/utils/exportImport';
+import { exportDatabaseToFile, importDatabaseFromFile, importDatabaseFromFileMerge, validateImportFile } from '@/lib/utils/exportImport';
 
 interface ExportImportSectionProps {
   onImportComplete?: () => void;
@@ -71,7 +71,7 @@ export default function ExportImportSection({ onImportComplete }: ExportImportSe
     }
   };
 
-  const handleImport = async () => {
+  const handleImport = async (mergeMode: boolean = false) => {
     if (!selectedFile || !validationResult?.valid) {
       return;
     }
@@ -79,11 +79,19 @@ export default function ExportImportSection({ onImportComplete }: ExportImportSe
     setLoading(true);
     setMessage(null);
     try {
-      const result = await importDatabaseFromFile(selectedFile);
-      setMessage({
-        type: 'success',
-        text: `Successfully imported ${result.cardsImported} cards and ${result.boxesImported} boxes!`
-      });
+      if (mergeMode) {
+        const result = await importDatabaseFromFileMerge(selectedFile);
+        setMessage({
+          type: 'success',
+          text: `Merge complete! Added ${result.cardsAdded} cards, updated ${result.cardsUpdated} cards. Added ${result.boxesAdded} boxes, updated ${result.boxesUpdated} boxes.`
+        });
+      } else {
+        const result = await importDatabaseFromFile(selectedFile);
+        setMessage({
+          type: 'success',
+          text: `Successfully imported ${result.cardsImported} cards and ${result.boxesImported} boxes!`
+        });
+      }
 
       // Reset file input
       if (fileInputRef.current) {
@@ -141,7 +149,7 @@ export default function ExportImportSection({ onImportComplete }: ExportImportSe
             Import Database
           </h3>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-            Replace all current data with cards and boxes from a backup file. This will delete all existing data.
+            Import cards and boxes from a backup file.
           </p>
         </div>
 
@@ -179,22 +187,29 @@ export default function ExportImportSection({ onImportComplete }: ExportImportSe
             </div>
           )}
 
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             {selectedFile && (
               <button
                 onClick={handleClearSelection}
                 disabled={loading}
-                className="flex-1 rounded-lg border border-zinc-300 dark:border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Clear
               </button>
             )}
             <button
-              onClick={handleImport}
+              onClick={() => handleImport(true)}
               disabled={loading || !selectedFile || !validationResult?.valid}
-              className="flex-1 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? 'Importing...' : 'Import Database'}
+              {loading ? 'Merging...' : 'Merge Import (Preserve Existing)'}
+            </button>
+            <button
+              onClick={() => handleImport(false)}
+              disabled={loading || !selectedFile || !validationResult?.valid}
+              className="w-full rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? 'Replacing...' : 'Replace Import (Delete All)'}
             </button>
           </div>
         </div>
