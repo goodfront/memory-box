@@ -1,7 +1,7 @@
 {
-  "name": "Memory Box - Charlotte Mason Memory System",
+  "name": "Memory Box - Memorization System",
   "short_name": "Memory Box",
-  "description": "Charlotte Mason memory system for memorizing quotations using spaced repetition",
+  "description": "A system for memorizing quotations using spaced repetition",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
