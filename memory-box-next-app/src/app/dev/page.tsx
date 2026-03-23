@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { injectTestCards, injectCardsDueToday, injectOverdueCards, resetWithTestCards, getTestDataSummary } from '@/lib/db/testData';
 import { clearDatabase } from '@/lib/db/schema';
+import ExportImportSection from '@/components/dev/ExportImportSection';
 
 interface Summary {
   total: number;
@@ -190,8 +191,20 @@ export default function DevToolsPage() {
           </div>
         )}
 
+        {/* Export/Import Section */}
+        <div>
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+            Backup & Restore
+          </h2>
+          <ExportImportSection onImportComplete={handleRefreshSummary} />
+        </div>
+
         {/* Action Buttons */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+            Test Data
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
             <div>
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -328,6 +341,7 @@ export default function DevToolsPage() {
               </Link>
             </div>
           </div>
+          </div>
         </div>
 
         {/* Usage Instructions */}
@@ -336,6 +350,9 @@ export default function DevToolsPage() {
             Usage Instructions
           </h3>
           <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-2 list-disc list-inside">
+            <li>Use &quot;Export Database&quot; to create a backup of all your cards and boxes as a JSON file</li>
+            <li>Use &quot;Merge Import&quot; to add new cards and update existing ones by ID while preserving cards not in the backup</li>
+            <li>Use &quot;Replace Import&quot; to restore from a backup file (this will delete all current data and replace it)</li>
             <li>Use &quot;Inject Test Cards&quot; to add diverse sample cards with different review schedules</li>
             <li>Use &quot;Inject Cards Due Today&quot; to quickly populate your review session for testing</li>
             <li>Use &quot;Reset Database&quot; when you want to start fresh with clean test data</li>
