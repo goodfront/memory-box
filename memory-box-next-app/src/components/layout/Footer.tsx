@@ -1,5 +1,6 @@
 'use client';
 
+import Link from "next/link";
 import { useDatabaseContext } from "@/components/providers";
 
 export function Footer() {
@@ -10,7 +11,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-center gap-2">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Memory Box
+            Memory Box <Link href="/dev" className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300">(dev)</Link>
           </p>
           {isReady && (
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-500">

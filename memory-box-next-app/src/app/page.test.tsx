@@ -21,7 +21,6 @@ describe('Home Page (Dashboard)', () => {
     expect(screen.getByRole('heading', { name: /^review session$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^new card$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^box overview$/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /^dev tools$/i })).toBeInTheDocument();
   });
 
   it('should render card descriptions', () => {
@@ -31,7 +30,6 @@ describe('Home Page (Dashboard)', () => {
     expect(screen.getByText(/review your cards due today/i)).toBeInTheDocument();
     expect(screen.getByText(/add a new quotation to memorize/i)).toBeInTheDocument();
     expect(screen.getByText(/view schedule levels and card counts/i)).toBeInTheDocument();
-    expect(screen.getByText(/inject test cards for development/i)).toBeInTheDocument();
   });
 
   it('should have correct links for all navigation cards', () => {
@@ -48,17 +46,14 @@ describe('Home Page (Dashboard)', () => {
 
     const boxLink = screen.getByRole('link', { name: /box overview.*view schedule levels/i });
     expect(boxLink).toHaveAttribute('href', '/box');
-
-    const devLink = screen.getByRole('link', { name: /dev tools.*inject test cards/i });
-    expect(devLink).toHaveAttribute('href', '/dev');
   });
 
-  it('should render 5 navigation cards', () => {
+  it('should render 4 navigation cards', () => {
     const { container } = render(<Home />);
 
     // Count all Link elements (navigation cards)
     const links = container.querySelectorAll('a');
-    expect(links).toHaveLength(5);
+    expect(links).toHaveLength(4);
   });
 
   it('should apply proper styling classes', () => {
