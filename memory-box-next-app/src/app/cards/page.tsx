@@ -15,7 +15,7 @@ function CardsPageContent() {
 
   // Get initial values from URL params
   const initialSearch = searchParams.get('search') || '';
-  const initialSort = (searchParams.get('sort') as SortOption) || 'timeAdded';
+  const initialSort = (searchParams.get('sort') as SortOption) || 'timeAddedDesc';
   const initialSchedule = (searchParams.get('schedule') as Schedule | 'all') || 'all';
 
   useEffect(() => {
@@ -45,7 +45,7 @@ function CardsPageContent() {
     const newParams = new URLSearchParams(searchParams.toString());
 
     Object.entries(params).forEach(([key, value]) => {
-      if (value && value !== '' && value !== 'all' && value !== 'timeAdded') {
+      if (value && value !== '' && value !== 'all' && value !== 'timeAddedDesc') {
         newParams.set(key, value);
       } else {
         newParams.delete(key);

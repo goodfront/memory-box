@@ -202,34 +202,34 @@ describe('CardList', () => {
   });
 
   describe('sorting', () => {
-    it('should sort by date added (oldest first) by default', () => {
+    it('should sort by date added (newest first) by default', () => {
       render(<CardList cards={mockCards} showControls={true} />);
 
       const quotations = screen.getAllByText(/quotation/i);
-      expect(quotations[0].textContent).toContain('First'); // 2025-01-01
-      expect(quotations[1].textContent).toContain('Second'); // 2025-01-02
-      expect(quotations[2].textContent).toContain('Third'); // 2025-01-03
-    });
-
-    it('should sort by date added (newest first)', async () => {
-      const user = userEvent.setup();
-      render(<CardList cards={mockCards} showControls={true} />);
-
-      const sortSelect = screen.getByDisplayValue(/date added \(oldest first\)/i);
-      await user.selectOptions(sortSelect, 'timeAddedDesc');
-
-      const quotations = screen.getAllByText(/quotation/i);
-      // Sorted by date added descending (newest first)
       expect(quotations[0].textContent).toContain('Third'); // 2025-01-03
       expect(quotations[1].textContent).toContain('Second'); // 2025-01-02
       expect(quotations[2].textContent).toContain('First'); // 2025-01-01
+    });
+
+    it('should sort by date added (oldest first)', async () => {
+      const user = userEvent.setup();
+      render(<CardList cards={mockCards} showControls={true} />);
+
+      const sortSelect = screen.getByDisplayValue(/date added \(newest first\)/i);
+      await user.selectOptions(sortSelect, 'timeAdded');
+
+      const quotations = screen.getAllByText(/quotation/i);
+      // Sorted by date added ascending (oldest first)
+      expect(quotations[0].textContent).toContain('First'); // 2025-01-01
+      expect(quotations[1].textContent).toContain('Second'); // 2025-01-02
+      expect(quotations[2].textContent).toContain('Third'); // 2025-01-03
     });
 
     it('should sort by author', async () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const sortSelect = screen.getByDisplayValue(/date added \(oldest first\)/i);
+      const sortSelect = screen.getByDisplayValue(/date added \(newest first\)/i);
       await user.selectOptions(sortSelect, 'author');
 
       const quotations = screen.getAllByText(/quotation/i);
@@ -242,7 +242,7 @@ describe('CardList', () => {
       const user = userEvent.setup();
       render(<CardList cards={mockCards} showControls={true} />);
 
-      const sortSelect = screen.getByDisplayValue(/date added \(oldest first\)/i);
+      const sortSelect = screen.getByDisplayValue(/date added \(newest first\)/i);
       await user.selectOptions(sortSelect, 'authorDesc');
 
       const quotations = screen.getAllByText(/quotation/i);
@@ -351,7 +351,7 @@ describe('CardList', () => {
       await user.type(searchInput, 'quotation');
 
       // Then sort by author
-      const sortSelect = screen.getByDisplayValue(/date added \(oldest first\)/i);
+      const sortSelect = screen.getByDisplayValue(/date added \(newest first\)/i);
       await user.selectOptions(sortSelect, 'author');
 
       const quotations = screen.getAllByText(/quotation/i);
